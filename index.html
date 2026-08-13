@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1026">
+<link rel="icon" href="data:,">
+<title>一掷千金 · Deal or No Deal</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --gold:#d8b45a;--gold-l:#ffd166;--gold-d:#a07c2e;--blue-deep:#0b1026;
+  --c-white:#e8e8ea;--c-blue:#4da3ff;--c-green:#3ddc97;--c-yellow:#f9c74f;
+  --c-red:#e63946;--c-orange:#ff8a3d;--c-purple:#a364e3;--c-deepblue:#5b7fe6;--c-magenta:#e94e8b;
+}
+html,body{height:100%;}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background:radial-gradient(1200px 700px at 50% -10%,#1c2a5a 0%,var(--blue-deep) 55%,#05070f 100%);
+  color:#fff;overflow-x:hidden;min-height:100%;user-select:none;-webkit-user-select:none;
+}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(500px 300px at 12% 85%,rgba(216,180,90,.10),transparent 70%),radial-gradient(500px 300px at 88% 80%,rgba(255,209,102,.08),transparent 70%);animation:glowPulse 6s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+#app{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:10px 12px 30px;}
+#topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:6px 10px;background:linear-gradient(180deg,rgba(216,180,90,.16),rgba(216,180,90,.04));border:1px solid rgba(216,180,90,.35);border-radius:12px;margin-bottom:8px;}
+.logo{font-size:1.25rem;font-weight:900;letter-spacing:2px;background:linear-gradient(180deg,#ffe9a8,#d8b45a 55%,#9a7a2c);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 22px rgba(255,209,102,.35);}
+.logo small{font-size:.62rem;font-weight:400;color:#8fa0c8;letter-spacing:1px;display:block;line-height:1;}
+.stats{display:flex;gap:8px;flex-wrap:wrap;}
+.stat{font-size:.72rem;color:#b9c4e4;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);padding:3px 8px;border-radius:999px;white-space:nowrap;}
+.stat b{color:var(--gold-l);font-weight:700;}
+.stat.mode-tag{border-color:rgba(255,209,102,.45);color:var(--gold-l);}
+.stat.mode-tag b{color:#fff;}
+.stat.mode-sidegame{border-color:rgba(233,78,139,.55);color:#fbb4cc;}
+.stat.mode-sidegame b{color:#fff;}
+.stat.bonus-tag{border-color:rgba(127,224,211,.55);color:#7fe0d3;}
+.stat.bonus-tag b{color:#fff;}
+
+.color-legend{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.cl{font-size:.68rem;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#c7d0ec;}
+.cl b{font-weight:800;}
+.cl.cleared{opacity:.75;border-style:dashed;}
+.cl.cleared b{color:#7fe0d3;}
+.cl.dim{opacity:.45;}
+
+#main{display:flex;gap:12px;align-items:flex-start;}
+.money-col{flex:0 0 118px;display:flex;flex-direction:column;gap:3px;}
+.board-title{text-align:center;font-size:.66rem;color:#7f8db4;letter-spacing:3px;padding:2px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:3px;}
+.money-cell{font-size:.72rem;font-weight:700;text-align:center;padding:4px 2px;border-radius:6px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);transition:all .3s;font-variant-numeric:tabular-nums;color:#dfe6f7;}
+.money-cell.gone{color:#4a5578!important;text-decoration:line-through;background:transparent!important;border-color:transparent!important;transform:scale(.9);}
+.money-cell.hot{background:rgba(255,209,102,.18);border-color:rgba(255,209,102,.5);color:var(--gold-l);font-weight:800;box-shadow:0 0 10px rgba(255,209,102,.4);}
+.money-cell.c-white{color:var(--c-white);background:rgba(232,232,234,.08);border-color:rgba(232,232,234,.25);}
+.money-cell.c-blue{color:var(--c-blue);background:rgba(77,163,255,.10);border-color:rgba(77,163,255,.28);}
+.money-cell.c-green{color:var(--c-green);background:rgba(61,220,151,.10);border-color:rgba(61,220,151,.28);}
+.money-cell.c-yellow{color:var(--c-yellow);background:rgba(249,199,79,.10);border-color:rgba(249,199,79,.28);}
+.money-cell.c-red{color:var(--c-red);background:rgba(230,57,70,.10);border-color:rgba(230,57,70,.28);}
+.money-cell.c-orange{color:var(--c-orange);background:rgba(255,138,61,.10);border-color:rgba(255,138,61,.28);}
+.money-cell.c-purple{color:var(--c-purple);background:rgba(163,100,227,.10);border-color:rgba(163,100,227,.28);}
+.money-cell.c-deepblue{color:var(--c-deepblue);background:rgba(91,127,230,.10);border-color:rgba(91,127,230,.28);}
+.money-cell.c-magenta{color:var(--c-magenta);background:rgba(233,78,139,.12);border-color:rgba(233,78,139,.32);font-weight:800;}
+
+#center{flex:1;min-width:0;}
+#message{text-align:center;font-size:.95rem;font-weight:700;color:#ffe9a8;background:linear-gradient(180deg,rgba(216,180,90,.18),rgba(216,180,90,.05));border:1px solid rgba(216,180,90,.4);border-radius:10px;padding:8px 10px;margin-bottom:8px;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;text-shadow:0 1px 4px rgba(0,0,0,.5);transition:transform .15s;}
+#message.pop{animation:msgPop .35s ease;}
+@keyframes msgPop{0%{transform:scale(.96);}60%{transform:scale(1.03);}100%{transform:scale(1);}}
+#roundDots{display:flex;justify-content:center;gap:7px;margin-bottom:8px;min-height:10px;}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(216,180,90,.35);transition:all .3s;}
+.dot.done{background:var(--gold-l);box-shadow:0 0 8px rgba(255,209,102,.8);}
+.dot.cur{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.9);animation:pulseDot 1s ease infinite;}
+@keyframes pulseDot{0%,100%{transform:scale(1);}50%{transform:scale(1.4);}}
+
+/* 箱子：打开前外观完全一致（银色） */
+#casesBoard{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;padding:6px 2px;}
+.case{
+  aspect-ratio:4/3.1;position:relative;cursor:pointer;
+  background:linear-gradient(160deg,#93a4bd 0%,#64768f 45%,#45566e 100%);
+  border:2px solid rgba(255,255,255,.28);border-radius:9px;
+  box-shadow:inset 0 2px 6px rgba(255,255,255,.35),inset 0 -8px 14px rgba(0,0,0,.5),0 5px 12px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  transition:transform .18s,box-shadow .18s,filter .3s;overflow:visible;
+}
+.case::before{content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:36%;height:12px;border:2px solid #d8b45a;border-bottom:none;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#9fb0c8,#6b7c94);box-shadow:0 -2px 4px rgba(0,0,0,.3);}
+.case .num{font-size:1.5rem;font-weight:900;color:#f4e9c4;text-shadow:0 2px 4px rgba(0,0,0,.6);line-height:1;}
+.case .corner{position:absolute;bottom:5px;left:6px;font-size:.55rem;color:rgba(255,255,255,.4);letter-spacing:1px;}
+.case .corner-r{position:absolute;top:6px;right:6px;font-size:.7rem;}
+.case:hover:not(.opened):not(.mine){transform:translateY(-4px) scale(1.05);box-shadow:0 10px 20px rgba(0,0,0,.6),0 0 18px rgba(255,209,102,.35);}
+.case:active:not(.opened){transform:scale(.95);}
+.case.mine{border-color:var(--gold-l);box-shadow:0 0 20px rgba(255,209,102,.85),inset 0 0 16px rgba(255,209,102,.25);background:linear-gradient(160deg,#c2a457,#8a6a2c 60%,#6d5320);}
+.case.mine .num{color:#fff6da;}
+.case.mine::before{border-color:var(--gold-l);}
+.case.boardB::after{content:"B";position:absolute;top:4px;left:6px;font-size:.6rem;color:rgba(127,224,211,.9);font-weight:800;}
+.case.surprise-mark::before{border-color:#ffd166;}
+.case.surprise-mark .corner{content:"";}
+.case .smark{position:absolute;bottom:4px;right:5px;font-size:.85rem;filter:drop-shadow(0 0 4px rgba(255,209,102,.8));animation:missionBlink 1.6s ease infinite;}
+@keyframes missionBlink{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+.case.mission{border-color:#7fe0d3!important;box-shadow:0 0 18px rgba(127,224,211,.65)!important;}
+.case.mission::after{content:"💰";position:absolute;top:-12px;right:-6px;font-size:1rem;filter:drop-shadow(0 0 4px rgba(127,224,211,.7));animation:missionBlink 1.4s ease infinite;}
+.case.opened{filter:brightness(.42) saturate(.7);cursor:default;box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 3px 6px rgba(0,0,0,.35);}
+.case.opened:hover{transform:none;}
+.case.opened .num{display:none;}
+.case.opened .corner,.case.opened .corner-r,.case.opened .smark{display:none;}
+.case.opened .amount{font-size:1rem;font-weight:900;color:#ffe9a8;background:rgba(0,0,0,.62);border:1px solid rgba(255,209,102,.55);border-radius:6px;padding:3px 7px;text-shadow:0 0 12px rgba(255,209,102,.7);animation:popIn .5s cubic-bezier(.2,1.4,.4,1);text-align:center;line-height:1.25;}
+.case.flip{animation:caseFlip .5s ease;}
+@keyframes caseFlip{0%{transform:scale(1);}30%{transform:scale(1.18) rotate(3deg);}55%{transform:scale(.92) rotate(-2deg);}100%{transform:scale(1);}}
+@keyframes popIn{0%{transform:scale(0);opacity:0;}70%{transform:scale(1.3);}100%{transform:scale(1);opacity:1;}}
+
+#playerSlot{display:none;align-items:center;gap:8px;justify-content:center;margin-bottom:8px;}
+#playerSlot.show{display:flex;}
+.slot-label{font-size:.7rem;color:#8fa0c8;letter-spacing:2px;}
+.slot-case{width:52px;height:40px;position:relative;background:linear-gradient(160deg,#c2a457,#8a6a2c 60%,#6d5320);border:2px solid var(--gold-l);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff6da;font-size:1rem;box-shadow:0 0 14px rgba(255,209,102,.7);animation:slotIn .5s cubic-bezier(.2,1.6,.4,1);}
+.slot-case::before{content:"";position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:40%;height:8px;border:1.5px solid var(--gold-l);border-bottom:none;border-radius:4px 4px 0 0;}
+@keyframes slotIn{0%{transform:translateY(-16px) scale(.5);opacity:0;}100%{transform:translateY(0) scale(1);opacity:1;}}
+#hint{text-align:center;font-size:.7rem;color:#6f7da5;margin-top:8px;letter-spacing:1px;}
+
+#overlayRoot{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(4,7,18,.86);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .35s;padding:18px;}
+.overlay.show{opacity:1;pointer-events:auto;}
+.ocard{max-width:500px;width:100%;background:linear-gradient(180deg,#1b2447 0%,#101634 100%);border:2px solid rgba(216,180,90,.6);border-radius:18px;padding:24px 22px;text-align:center;box-shadow:0 0 60px rgba(216,180,90,.25),0 24px 60px rgba(0,0,0,.6);transform:translateY(24px) scale(.94);transition:transform .4s cubic-bezier(.2,1.3,.4,1);max-height:90vh;overflow-y:auto;}
+.overlay.show .ocard{transform:translateY(0) scale(1);}
+.ocard h1{font-size:2rem;letter-spacing:6px;font-weight:900;background:linear-gradient(180deg,#ffe9a8,#d8b45a 60%,#9a7a2c);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:6px;}
+.ocard .sub{font-size:.78rem;color:#93a1c8;margin-bottom:14px;letter-spacing:2px;}
+.ocard .desc{font-size:.85rem;color:#c7d0ec;line-height:1.75;margin-bottom:14px;text-align:left;}
+.ocard .desc b{color:var(--gold-l);}
+
+.mode-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:6px 0;}
+.mode-btn{min-width:130px;font-size:.95rem;}
+.mode-desc{font-size:.78rem;color:#b9c4e4;min-height:52px;line-height:1.6;margin:8px 0 6px;text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;}
+.mode-desc b{color:var(--gold-l);}
+.mode-desc .hint{color:#8fa0c8;font-size:.72rem;display:block;margin-top:4px;}
+.sidegame-tag{display:inline-block;font-size:.6rem;color:#fbb4cc;background:rgba(233,78,139,.15);border:1px solid rgba(233,78,139,.4);padding:1px 6px;border-radius:999px;margin-left:6px;vertical-align:middle;}
+
+/* Sidegame 子菜单 */
+.sg-list{display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+.sg-item{display:flex;align-items:center;gap:10px;text-align:left;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .15s;}
+.sg-item:hover{background:rgba(255,255,255,.09);border-color:rgba(255,209,102,.5);}
+.sg-item:active{transform:scale(.98);}
+.sg-item .e{font-size:1.5rem;flex:0 0 34px;text-align:center;}
+.sg-item .t{font-weight:800;color:#ffe9a8;font-size:.92rem;letter-spacing:1px;}
+.sg-item .t small{display:block;font-size:.62rem;color:#8fa0c8;font-weight:400;letter-spacing:0;}
+.sg-item .go{flex:0 0 auto;font-size:.78rem;color:#7fe0d3;font-weight:800;letter-spacing:2px;}
+
+.btn{font-family:inherit;font-size:1rem;font-weight:800;letter-spacing:2px;border:none;border-radius:12px;padding:14px 22px;cursor:pointer;color:#fff;transition:transform .15s,box-shadow .15s,filter .15s;min-width:150px;}
+.btn:active{transform:scale(.95);}
+.btn-gold{background:linear-gradient(180deg,#f5d787,#d8b45a 55%,#a07c2e);color:#241a05;box-shadow:0 6px 18px rgba(216,180,90,.4);}
+.btn-gold:hover{filter:brightness(1.08);transform:translateY(-2px);}
+.btn-red{background:linear-gradient(180deg,#ff5a66,#d62f3d 60%,#9e1f2b);box-shadow:0 6px 18px rgba(214,47,61,.4);}
+.btn-green{background:linear-gradient(180deg,#3fc4b4,#1f8f83 60%,#14685f);box-shadow:0 6px 18px rgba(31,143,131,.4);}
+.btn-purple{background:linear-gradient(180deg,#a364e3,#7a3fb8 60%,#4d237a);box-shadow:0 6px 18px rgba(122,63,184,.4);}
+.btn-magenta{background:linear-gradient(180deg,#f06aa0,#e94e8b 60%,#a82360);box-shadow:0 6px 18px rgba(233,78,139,.45);}
+.btn-cyan{background:linear-gradient(180deg,#3fc4b4,#1f8f83 60%,#14685f);box-shadow:0 6px 18px rgba(31,143,131,.4);}
+.btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#dfe6f7;}
+.btn-ghost:hover{background:rgba(255,255,255,.14);}
+.btn-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+.banker-emoji{font-size:2.6rem;animation:ringSwing .5s ease infinite alternate;display:inline-block;}
+@keyframes ringSwing{from{transform:rotate(-12deg);}to{transform:rotate(12deg);}}
+.banker-title{font-size:.8rem;color:#8fa0c8;letter-spacing:4px;margin:8px 0 4px;}
+.banker-line{font-size:.92rem;color:#ffd9a0;min-height:44px;display:flex;align-items:center;justify-content:center;margin:10px 0;font-style:italic;line-height:1.5;}
+.offer-box{font-size:2.1rem;font-weight:900;letter-spacing:1px;color:#ffe9a8;background:linear-gradient(180deg,rgba(216,180,90,.22),rgba(216,180,90,.05));border:2px solid rgba(216,180,90,.6);border-radius:14px;padding:14px 10px;margin:12px 0;font-variant-numeric:tabular-nums;text-shadow:0 0 24px rgba(255,209,102,.5);}
+.offer-question{font-size:.9rem;color:#c7d0ec;margin-bottom:16px;letter-spacing:2px;}
+.offer-btn-wrap{opacity:0;transform:translateY(8px);transition:all .4s;}
+.offer-btn-wrap.show{opacity:1;transform:translateY(0);}
+
+.remain-panel{margin:4px 0 10px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px;}
+.rp-title{font-size:.66rem;color:#7f8db4;letter-spacing:2px;margin-bottom:6px;}
+.rp-grid{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+.rc{font-size:.66rem;font-weight:700;color:#cfe0ff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:2px 6px;font-variant-numeric:tabular-nums;}
+.rc.big{color:#ffe9a8;border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.1);}
+
+.color-status{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:2px 0 8px;}
+.cs{font-size:.64rem;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.15);color:#b9c4e4;background:rgba(255,255,255,.04);}
+.cs.done{color:#7fe0d3;border-color:rgba(127,224,211,.4);}
+.cs .bonus{color:#ffd166;font-weight:800;}
+
+.haggle-panel{padding:6px 0;}
+.hp-title{font-size:.85rem;color:#ffd9a0;margin-bottom:12px;line-height:1.5;}
+.hp-range{display:flex;align-items:center;gap:8px;font-size:.72rem;color:#93a1c8;margin-bottom:8px;}
+.hp-range input[type=range]{flex:1;accent-color:#d8b45a;height:26px;}
+.hp-val{font-size:1.2rem;font-weight:900;color:#ffe9a8;margin-bottom:14px;font-variant-numeric:tabular-nums;text-shadow:0 0 14px rgba(255,209,102,.4);}
+.banker-thinking{font-size:.9rem;color:#ffd9a0;padding:10px 0;letter-spacing:2px;}
+.banker-thinking .dots{animation:blink 1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+.swap-case{display:inline-flex;flex-direction:column;align-items:center;gap:8px;margin:0 10px;}
+.swap-case .sc{width:86px;height:66px;position:relative;background:linear-gradient(160deg,#93a4bd,#45566e);border:2px solid rgba(255,255,255,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem;color:#f4e9c4;box-shadow:0 8px 18px rgba(0,0,0,.5);}
+.swap-case .sc::before{content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:40%;height:11px;border:2px solid #d8b45a;border-bottom:none;border-radius:5px 5px 0 0;}
+.swap-case .sc.mine{background:linear-gradient(160deg,#c2a457,#6d5320);border-color:var(--gold-l);}
+.swap-case .sc.flip-reveal{animation:caseFlip .6s ease;}
+.swap-case .sc.flip-reveal .amount{font-size:1rem;color:var(--gold-l);font-weight:800;animation:popIn .5s;}
+.swap-case .sc.flip-reveal .num{display:none;}
+.swap-case .cap{font-size:.72rem;color:#93a1c8;letter-spacing:2px;}
+
+.result-amount{font-size:2.4rem;font-weight:900;color:#ffe9a8;text-shadow:0 0 30px rgba(255,209,102,.6);margin:8px 0;font-variant-numeric:tabular-nums;}
+.result-extra{font-size:.8rem;color:#93a1c8;line-height:1.8;margin-bottom:16px;}
+.result-extra .warn{color:#ffb4ba;}
+.result-extra .good{color:#7fe0d3;}
+.result-extra .bonus-line{color:#fbb4cc;font-size:1rem;font-weight:900;margin:8px 0;}
+
+#confettiRoot{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden;}
+.confetti-piece{position:absolute;top:-24px;width:9px;height:15px;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(112vh) rotate(760deg);}}
+
+#colorFlashTop{position:fixed;top:12%;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none;display:none;}
+#colorFlashTop.show{display:block;animation:flashIn 2.6s ease forwards;}
+@keyframes flashIn{0%{transform:translateX(-50%) scale(.6);opacity:0;}12%{transform:translateX(-50%) scale(1.08);opacity:1;}22%{transform:translateX(-50%) scale(1);}85%{opacity:1;}100%{opacity:0;}}
+.cf-card{background:linear-gradient(180deg,#1b2447,#101634);border:2px solid #ffd166;border-radius:16px;padding:18px 30px;text-align:center;box-shadow:0 0 50px rgba(255,209,102,.5);min-width:280px;}
+.cf-card .t{font-size:.8rem;color:#8fa0c8;letter-spacing:3px;}
+.cf-card .v{font-size:1.5rem;font-weight:900;color:#ffe9a8;margin-top:6px;text-shadow:0 0 18px rgba(255,209,102,.6);}
+.cf-card.million{border-color:var(--c-magenta);box-shadow:0 0 60px rgba(233,78,139,.55);}
+.cf-card.million .v{color:#ffd0e2;text-shadow:0 0 18px rgba(233,78,139,.7);}
+.cf-card.mission-done{border-color:#7fe0d3;box-shadow:0 0 60px rgba(127,224,211,.55);}
+.cf-card.mission-done .v{color:#bff5e7;}
+
+/* 双倍或归零 神秘箱 */
+.mystery-case{width:120px;height:96px;margin:10px auto;position:relative;background:linear-gradient(160deg,#5a3b8c,#3a2260 60%,#24123f);border:3px solid #a364e3;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;box-shadow:0 0 30px rgba(163,100,227,.5),0 10px 24px rgba(0,0,0,.5);animation:ringSwing .6s ease infinite alternate;}
+.mystery-case::before{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:45%;height:13px;border:2px solid #a364e3;border-bottom:none;border-radius:5px 5px 0 0;}
+
+/* 交易轮盘 */
+.wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;margin:10px 0;}
+.wheel-holder{position:relative;width:250px;height:250px;}
+.wheel-pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:5;font-size:1.8rem;filter:drop-shadow(0 0 6px rgba(255,255,255,.6));}
+.wheel{width:100%;height:100%;border-radius:50%;position:relative;border:4px solid #d8b45a;box-shadow:0 0 40px rgba(216,180,90,.3),inset 0 0 30px rgba(0,0,0,.4);transition:transform 4.2s cubic-bezier(.12,.72,.18,1);overflow:hidden;}
+.wheel .seg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;color:#fff;clip-path:polygon(50% 50%, 0% 0%, 100% 0%);}
+.wheel .seg span{transform:translateY(-44px) rotate(calc(var(--rot) * -1deg));transform-origin:center;white-space:nowrap;display:block;width:60px;text-align:center;font-variant-numeric:tabular-nums;}
+.wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:linear-gradient(180deg,#f5d787,#a07c2e);border-radius:50%;z-index:3;box-shadow:0 0 16px rgba(255,209,102,.7);}
+
+/* 双倍板 */
+.board-tag{position:absolute;top:-8px;left:-8px;width:20px;height:20px;border-radius:50%;background:#2a9d8f;color:#fff;font-size:.62rem;font-weight:900;display:flex;align-items:center;justify-content:center;}
+
+/* 对决 */
+.vs-box{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0;flex-wrap:wrap;}
+.vs-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px 18px;min-width:130px;}
+.vs-card .who{font-size:.7rem;color:#8fa0c8;letter-spacing:2px;}
+.vs-card .amt{font-size:1.3rem;font-weight:900;color:#ffe9a8;margin-top:4px;font-variant-numeric:tabular-nums;}
+.vs-card.win{border-color:#7fe0d3;box-shadow:0 0 18px rgba(127,224,211,.35);}
+.vs-card.lose{opacity:.55;}
+.vs-vs{font-size:1.4rem;font-weight:900;color:#8fa0c8;}
+
+/* 返回主菜单悬浮按钮 */
+.home-btn{
+  position:fixed;bottom:20px;right:16px;z-index:150;
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(20,27,56,.9);border:2px solid rgba(216,180,90,.65);
+  font-size:1.3rem;cursor:pointer;color:#ffe9a8;
+  box-shadow:0 4px 16px rgba(0,0,0,.55),0 0 14px rgba(216,180,90,.2);
+  transition:transform .15s,box-shadow .15s;
+  display:none;align-items:center;justify-content:center;
+}
+.home-btn:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(0,0,0,.6),0 0 18px rgba(255,209,102,.4);}
+.home-btn:active{transform:scale(.9);}
+.home-btn .tip{position:absolute;bottom:54px;right:0;font-size:.66rem;color:#8fa0c8;background:rgba(10,14,30,.9);border:1px solid rgba(255,255,255,.15);padding:4px 8px;border-radius:6px;white-space:nowrap;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.home-btn:hover .tip{opacity:1;}
+
+/* 场上的"继续"按钮（翻箱后停留，玩家点继续再进结果） */
+.continue-btn{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  z-index:160;min-width:190px;font-size:1.05rem;letter-spacing:3px;
+  animation:continueIn .45s cubic-bezier(.2,1.4,.4,1);
+  box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 24px rgba(255,209,102,.45);
+}
+@keyframes continueIn{from{opacity:0;transform:translateX(-50%) scale(.75);}to{opacity:1;transform:translateX(-50%) scale(1);}}
+.continue-btn:active{transform:translateX(-50%) scale(.95);}
+.continue-btn:hover{transform:translateX(-50%) translateY(-2px);filter:brightness(1.08);}
+
+@media (max-width:760px){
+  #main{flex-direction:row;flex-wrap:wrap;}
+  #center{flex:0 0 100%;order:1;}
+  .money-col{flex:0 0 49%;order:2;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:4px;}
+  #colRight{order:3;}
+  .board-title{display:none;}
+  #boardLeft,#boardRight{flex:0 0 100%;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:3px;}
+  .money-cell{flex:0 0 calc(33.3% - 3px);font-size:.62rem;padding:3px 1px;border-radius:4px;box-sizing:border-box;}
+  .money-cell.gone{display:none;}
+  #casesBoard{grid-template-columns:repeat(4,1fr);gap:9px;}
+  .case .num{font-size:1.25rem;}
+  .case.opened .amount{font-size:.85rem;}
+  .offer-box{font-size:1.7rem;}
+  #message{font-size:.85rem;min-height:40px;}
+  .stats{gap:5px;}
+  .stat{font-size:.63rem;padding:2px 6px;}
+  .ocard{padding:20px 16px;}
+  .ocard h1{font-size:1.6rem;letter-spacing:4px;}
+  .btn{min-width:110px;padding:11px 12px;font-size:.88rem;letter-spacing:1px;}
+  .mode-btn{min-width:96px;}
+  .wheel-holder{width:200px;height:200px;}
+  .sg-item .t{font-size:.82rem;}
+}
+/* ============== 关于 / 分享 / 回放 ============== */
+.about-link{position:fixed;left:14px;bottom:14px;z-index:200;font-size:.78rem;color:#8fa0c8;background:rgba(20,28,60,.72);border:1px solid rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;cursor:pointer;letter-spacing:1px;transition:.2s;}
+.about-link:hover{color:#ffe9a8;border-color:rgba(216,180,90,.6);}
+#infoOverlay,#shareOverlay,#replayOverlay{position:fixed;inset:0;z-index:230;display:none;align-items:center;justify-content:center;background:rgba(4,7,18,.92);backdrop-filter:blur(4px);padding:18px;overflow:auto;}
+#infoOverlay.show,#shareOverlay.show,#replayOverlay.show{display:flex;}
+.info-card{max-width:580px;width:100%;background:linear-gradient(180deg,#1b2447,#101634);border:2px solid rgba(216,180,90,.55);border-radius:18px;padding:22px 24px;max-height:88vh;overflow-y:auto;}
+.info-card h2{font-size:1.2rem;color:#ffe9a8;margin:14px 0 6px;letter-spacing:2px;}
+.info-card h2:first-child{margin-top:0;}
+.info-card p{font-size:.85rem;line-height:1.7;color:#c7d0ec;margin:6px 0;}
+.info-card .disc{font-size:.76rem;color:#9fb0d6;border-left:3px solid rgba(216,180,90,.5);padding-left:10px;margin-top:8px;line-height:1.8;}
+.share-box{width:100%;height:120px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);border-radius:10px;color:#dfe6f7;font-family:monospace;font-size:.7rem;padding:8px;resize:none;word-break:break-all;line-height:1.5;}
+/* 回放 */
+#replayOverlay{flex-direction:column;justify-content:flex-start;padding:14px 18px;}
+.replay-top{width:100%;max-width:780px;display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.replay-title{font-size:1rem;color:#ffe9a8;font-weight:800;letter-spacing:2px;}
+.replay-close{margin-left:auto;}
+#replayBoard{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;max-width:780px;width:100%;}
+#replayBoard.board-b{grid-template-columns:repeat(6,1fr);}
+.replay-msg{min-height:42px;font-size:1.05rem;color:#ffe9a8;margin:10px 0 2px;text-align:center;font-weight:700;}
+.replay-hint{font-size:.78rem;color:#8fa0c8;text-align:center;min-height:18px;margin-bottom:4px;}
+#replayArea{display:flex;flex-direction:column;align-items:center;}
+.replay-offer{font-size:1.9rem;font-weight:900;color:#ffe9a8;background:linear-gradient(180deg,rgba(216,180,90,.22),rgba(216,180,90,.05));border:2px solid rgba(216,180,90,.6);border-radius:14px;padding:10px 18px;margin:8px 0;font-variant-numeric:tabular-nums;}
+.replay-result{max-width:500px;background:linear-gradient(180deg,#1b2447,#101634);border:2px solid rgba(216,180,90,.6);border-radius:18px;padding:22px;text-align:center;margin:8px 0;}
+.replay-result .ra{font-size:2.2rem;font-weight:900;color:#ffe9a8;text-shadow:0 0 24px rgba(255,209,102,.5);}
+.replay-result .rt{font-size:1.25rem;color:#ffe9a8;letter-spacing:2px;margin-bottom:6px;}
+.replay-result .rl{font-size:.82rem;color:#c7d0ec;margin:4px 0;}
+.replay-controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center;max-width:780px;width:100%;}
+.replay-controls input[type=range]{flex:1;min-width:160px;accent-color:#d8b45a;}
+.replay-step{font-size:.8rem;color:#8fa0c8;min-width:92px;text-align:center;}
+@media (max-width:680px){ #replayBoard{grid-template-columns:repeat(4,1fr);} #replayBoard.board-b{grid-template-columns:repeat(5,1fr);} .replay-offer{font-size:1.4rem;} }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<div id="app">
+  <header id="topbar">
+    <div class="logo">一掷千金<small>DEAL or NO DEAL</small></div>
+    <div class="stats">
+      <span class="stat mode-tag" id="statMode" style="display:none">模式 <b>经典</b></span>
+      <span class="stat" id="statRound">第 <b>1</b> 轮</span>
+      <span class="stat" id="statLeft">剩余 <b>25</b> 箱</span>
+      <span class="stat" id="statTop">最高 <b>¥1,000,000</b></span>
+      <span class="stat bonus-tag" id="statBonus" style="display:none">保底 <b>+¥0</b></span>
+      <span class="stat bonus-tag" id="statMission" style="display:none">任务 <b>0</b></span>
+      <span class="stat bonus-tag" id="statBoard" style="display:none">A板 <b>26</b> · B板 <b>26</b></span>
+    </div>
+  </header>
+
+  <div id="colorLegend" class="color-legend" style="display:none"></div>
+
+  <div id="playerSlot">
+    <span class="slot-label">你的幸运箱</span>
+    <div class="slot-case" id="slotCaseNum">#?</div>
+  </div>
+
+  <div id="main">
+    <div class="money-col" id="colLeft">
+      <div class="board-title">小额</div>
+      <div id="boardLeft"></div>
+    </div>
+    <div id="center">
+      <div id="message">☎ 欢迎来到《一掷千金》</div>
+      <div id="roundDots"></div>
+      <div id="casesBoard"></div>
+      <div id="hint"></div>
+    </div>
+    <div class="money-col" id="colRight">
+      <div class="board-title">大额</div>
+      <div id="boardRight"></div>
+    </div>
+  </div>
+</div>
+
+<div id="overlayRoot"></div>
+<div id="confettiRoot"></div>
+<div id="colorFlashTop"></div>
+<button class="home-btn" id="btnHome" title="返回主菜单"><span>🏠</span><span class="tip">返回主菜单</span></button>
+
+<!-- 关于 / 免责声明 -->
+<div id="infoOverlay">
+  <div class="info-card">
+    <h2>📺 节目背景</h2>
+    <p>《一掷千金》(Deal or No Deal) 是一档经典的电视抽奖游戏节目：现场摆放 26 个手提箱，里面藏着从 ¥0.01 到 ¥1,000,000 不等的奖金。选手先选一个作为自己的"幸运箱"，随后逐轮打开其他箱子；银行家会根据"剩余箱子里的金额"不断给出收购报价，选手每轮都要决定 <b>Deal（成交）</b> 还是 <b>No Deal（拒绝）</b>。最终要么在某一轮接受报价离场，要么走到最后与"台上的箱子"二选一，赌一把自己的幸运箱里究竟装了多少。</p>
+    <h2>🎮 玩法说明</h2>
+    <p>本网页是向该节目致敬的<b>非官方同人复刻</b>，包含经典模式与 7 个娱乐 Sidegame（奖金染色 · 百万任务 · 双倍或归零 · 赢家通吃 · 交易轮盘 · 惊喜箱 · 双倍奖金板）。所有金额、报价与随机结果均由程序生成，仅用于娱乐。</p>
+    <h2>⚠️ 免责声明</h2>
+    <p class="disc">1. 本作品为个人学习 / 娱乐用途的粉丝向复刻，与任何电视台、节目制作方或商标持有人<b>无任何官方关联</b>。Deal or No Deal 及相关标识归其各自权利人所有。<br>2. 游戏内所有奖金均为<b>虚拟数字</b>，不涉及任何真实货币、充值、赌博或变现；请勿将虚拟金额与现实金钱混淆。<br>3. 游戏过程产生的"对局码 / 分享链接"仅记录本局的随机结果与决策，<b>不含任何个人隐私信息</b>，可放心分享。<br>4. 本作品按"现状"提供，作者不对使用过程中的任何损失负责。</p>
+    <div class="btn-row" style="margin-top:16px"><button class="btn btn-gold" id="aboutClose">明白了</button></div>
+  </div>
+</div>
+
+<!-- 分享 / 导入对局码 -->
+<div id="shareOverlay">
+  <div class="info-card" style="border-color:rgba(63,196,180,.55)">
+    <h2 id="shareTitle" style="margin-top:0">分享</h2>
+    <div id="shareBody"></div>
+  </div>
+</div>
+
+<!-- 分步回放 -->
+<div id="replayOverlay">
+  <div class="replay-top">
+    <span class="replay-title" id="replayTitle">📼 回放</span>
+    <button class="btn btn-ghost replay-close" id="rpClose">✕ 关闭</button>
+  </div>
+  <div id="replayBoard"></div>
+  <div class="replay-msg" id="replayMsg"></div>
+  <div class="replay-hint" id="replayHint"></div>
+  <div id="replayArea"></div>
+  <div class="replay-controls">
+    <button class="btn btn-ghost" id="rpPrev">⏮ 上一步</button>
+    <button class="btn btn-gold" id="rpPlay">▶ 播放</button>
+    <button class="btn btn-ghost" id="rpNext">⏭ 下一步</button>
+    <input type="range" id="rpSlider" min="0" max="0" value="0">
+    <span class="replay-step" id="rpLabel">步骤 0 / 0</span>
+  </div>
+</div>
+
+<!-- 角落关于入口（始终可见） -->
+<div class="about-link" id="aboutLink">❓ 关于 / 免责</div>
+
+<script>
+'use strict';
+/* ================================================================
+ * 一掷千金 · Deal or No Deal — H5 单文件游戏 v4
+ * 经典模式 + 娱乐模式（7 个 Sidegame）：
+ *   ①奖金染色 Color Prize  ②百万美元任务 Million Dollar Mission
+ *   ③双倍或归零 Double or Nothing  ④赢家通吃 Winner Take All
+ *   ⑤交易轮盘 Deal Wheel  ⑥惊喜箱 Surprise Case  ⑦双倍奖金板 Double Board
+ * 箱子外观打开前完全一致；奖金染色仅作用于奖金等级/金额板。
+ * 全链路算法均自行拟定
+ * ================================================================ */
+
+/* ---------------- 配置 ---------------- */
+const AMOUNTS = [0.01,1,5,10,25,50,75,100,200,300,400,500,750,1000,5000,10000,25000,50000,75000,100000,200000,300000,400000,500000,750000,1000000];
+const BOARD_LEFT  = [0.01,1,5,10,25,50,75,100,200,300,400,500,750];
+const BOARD_RIGHT = [1000000,750000,500000,400000,300000,200000,100000,75000,50000,25000,10000,5000,1000];
+const ROUND_CASES = [6,5,4,3,2,1,1,1,1,1];
+const MAX_ROUND   = ROUND_CASES.length;
+const OFFER_FACTOR = [0.18,0.25,0.33,0.42,0.52,0.62,0.72,0.80,0.88,0.95];
+
+
+/* 奖金等级颜色（仅作用于金额板/奖金等级，箱子不染色） */
+const AMOUNT_TO_COLOR = {
+  0.01:'white',1:'white',5:'white',10:'white',
+  25:'blue',50:'blue',
+  75:'green',100:'green',200:'green',
+  300:'yellow',400:'yellow',500:'yellow',
+  750:'red',1000:'red',
+  5000:'orange',10000:'orange',25000:'orange',50000:'orange',
+  75000:'purple',100000:'purple',200000:'purple',
+  300000:'deepblue',400000:'deepblue',500000:'deepblue',
+  750000:'magenta',1000000:'magenta',
+};
+const COLOR_ORDER = ['white','blue','green','yellow','red','orange','purple','deepblue','magenta']; // 金额从小到大
+const COLOR_GROUPS = {
+  white:{name:'灰色',emoji:'⚪'}, blue:{name:'蓝色',emoji:'🔵'}, green:{name:'绿色',emoji:'🟢'},
+  yellow:{name:'黄色',emoji:'🟡'}, red:{name:'红色',emoji:'🔴'}, orange:{name:'橙色',emoji:'🟠'},
+  purple:{name:'紫色',emoji:'🟣'}, deepblue:{name:'深蓝',emoji:'🟦'}, magenta:{name:'品红',emoji:'🌸'},
+};
+function amountColor(v){ return AMOUNT_TO_COLOR[v] || 'white'; }
+
+const BANKER_LINES = ['我已经看清了你剩余的箱子，朋友。','这是我能给出的最好价格。','贪心会毁掉一切，收手吧。','拿走钱，回家，享受生活。','我的报价，永远不会亏待你。','下一个箱子，可能什么也没有。','这比继续冒险要聪明得多。','相信我，钱拿在手里才安心。'];
+const HOST_DEAL = ['成交！聪明人不会跟命运赌博！','恭喜！这是明智的决定！'];
+const HOST_NODEAL = ['胆识过人！让我们看看下一轮！','好样的！你拒绝了银行家！'];
+
+/* Sidegame 元信息 */
+const MODE_META = {
+  classic:    {name:'经典模式', emoji:'🎬', tag:'',            sidegame:false},
+  color:      {name:'奖金染色', emoji:'🎨', tag:'Sidegame',    sidegame:true},
+  million:    {name:'百万美元任务', emoji:'💰', tag:'Sidegame', sidegame:true},
+  double:     {name:'双倍或归零', emoji:'🔥', tag:'Sidegame',  sidegame:true},
+  winner:     {name:'赢家通吃', emoji:'🏆', tag:'Sidegame',    sidegame:true},
+  wheel:      {name:'交易轮盘', emoji:'🎡', tag:'Sidegame',    sidegame:true},
+  surprise:   {name:'惊喜箱', emoji:'🎁', tag:'Sidegame',      sidegame:true},
+  doubleboard:{name:'双倍奖金板', emoji:'🔀', tag:'Sidegame', sidegame:true},
+};
+
+/* ---------------- 工具 ---------------- */
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function fmt(n){ if(!Number.isFinite(n)) return '¥0'; if(Number.isInteger(n)) return '¥'+n.toLocaleString('zh-CN'); return '¥'+n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const mean = arr => arr.reduce((s,v)=>s+v,0)/arr.length;
+function roundToNice(n){
+  if(n>=1000000) return Math.round(n/50000)*50000;
+  if(n>=100000)  return Math.round(n/10000)*10000;
+  if(n>=10000)   return Math.round(n/1000)*1000;
+  if(n>=1000)    return Math.round(n/100)*100;
+  if(n>=100)     return Math.round(n/10)*10;
+  return Math.max(Math.round(n),5);
+}
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+
+/* ---------------- 音频 ---------------- */
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ const AC=window.AudioContext||window.webkitAudioContext; if(AC) audioCtx=new AC(); } if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume(); }
+function tone(freq,dur,type='sine',vol=0.3,when=0,slideTo=null){
+  if(!audioCtx) return;
+  const t=audioCtx.currentTime+when; const o=audioCtx.createOscillator(); const g=audioCtx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t); if(slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(slideTo,1),t+dur);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+  o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+dur+0.05);
+}
+function noise(dur=1.0,vol=0.25,freq=900){
+  if(!audioCtx) return;
+  const ctx=audioCtx; const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length)*vol;
+  const src=ctx.createBufferSource(); src.buffer=buf; const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=0.6;
+  src.connect(f); f.connect(ctx.destination); src.start();
+}
+const S = {
+  click:()=>{ tone(700,0.07,'triangle',0.22); },
+  pick:()=>{ tone(660,0.12,'triangle',0.3); tone(880,0.16,'triangle',0.3,0.09); tone(1175,0.2,'triangle',0.25,0.18); },
+  open:()=>{ tone(220,0.28,'sawtooth',0.22,0,90); tone(95,0.42,'sine',0.34,0.05,48); tone(1500,0.06,'square',0.06,0.02); },
+  ring:()=>{ for(let i=0;i<3;i++){ tone(440,0.32,'square',0.1,i*0.85); tone(480,0.32,'square',0.1,i*0.85); } },
+  heart:()=>{ tone(58,0.11,'sine',0.5); tone(52,0.13,'sine',0.42,0.2); },
+  offer:()=>{ [523,659,784,1047].forEach((f,i)=>tone(f,0.22,'triangle',0.26,i*0.11)); },
+  deal:()=>{ [523,659,784,1047,1319].forEach((f,i)=>tone(f,0.32,'triangle',0.28,i*0.13)); noise(1.1,0.16,1000); },
+  nod:()=>{ tone(392,0.14,'square',0.18); tone(523,0.22,'square',0.18,0.12); },
+  reveal:()=>{ tone(880,0.1,'triangle',0.22,0,1760); tone(1760,0.35,'triangle',0.22,0.12); },
+  fail:()=>{ tone(320,0.4,'sawtooth',0.2,0,140); tone(190,0.55,'sawtooth',0.16,0.28,90); },
+  swap:()=>{ tone(480,0.16,'triangle',0.24,0,760); tone(760,0.22,'triangle',0.24,0.14,1100); },
+  final:()=>{ [392,494,587,784].forEach((f,i)=>tone(f,0.5,'triangle',0.25,i*0.18)); noise(1.4,0.14,700); },
+  colorClear:()=>{ [659,784,988,1319].forEach((f,i)=>tone(f,0.3,'triangle',0.26,i*0.1)); noise(0.9,0.12,1200); },
+  haggle:()=>{ tone(392,0.14,'square',0.16); tone(587,0.2,'square',0.16,0.12); },
+  million:()=>{ [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,0.35,'triangle',0.3,i*0.1)); noise(1.6,0.18,1400); },
+  spin:()=>{ for(let i=0;i<14;i++) tone(700-i*30,0.05,'square',0.12,i*0.08); },
+  wheelHit:()=>{ [392,523,659,784,1047].forEach((f,i)=>tone(f,0.3,'triangle',0.26,i*0.12)); noise(0.8,0.12,900); },
+  doubleWin:()=>{ [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,0.3,'triangle',0.28,i*0.09)); noise(1.2,0.15,1200); },
+  zero:()=>{ tone(400,0.5,'sawtooth',0.2,0,120); tone(180,0.6,'sawtooth',0.18,0.35,60); },
+  win:()=>{ [392,523,659,784,1047,1319].forEach((f,i)=>tone(f,0.4,'triangle',0.26,i*0.12)); noise(1.6,0.16,1000); },
+};
+let heartTimer = null;
+function heartLoop(){ stopHeart(); heartTimer = setInterval(()=>S.heart(), 780); }
+function stopHeart(){ if(heartTimer){ clearInterval(heartTimer); heartTimer=null; } }
+
+/* ---------------- 状态 ---------------- */
+let cases = [];
+let playerCase = null;
+let round = 0, openedThisRound = 0, needThisRound = 0;
+let phase = 'init';
+let currentOffer = 0, maxOffer = 0, offerReady = false;
+let gameMode = 'classic', haggleUsed = false, finalWin = 0;
+let colorState = null, totalColorBonus = 0;
+let missionBoxes = [], missionBonus = 0, millionCount = 1;
+let surpriseCase = null, surpriseBonus = 0;
+let dbSub = 'A'; // doubleboard：本轮当前开哪块板
+let dbAOpened = 0, dbBOpened = 0; // doubleboard：本轮（非累计）已开 A/B 板箱数
+let REC = false;        // 是否正在记录本局对局（用于分享/回放）
+let REPLAY = null;      // 对局记录 {v, mode, seed, playerId, events:[]}
+let gameSeed = 0;       // 本局牌面随机种子（用于极简对局码：种子即可重建牌面）
+let extraGameResult = null; // double/wheel 结果 {type:'win'|'loss'|'skip', amount}
+
+/* ---------------- 模式钩子 ---------------- */
+// 确定性 PRNG：同一 seed 必产出同一序列（录制与回放共用，保证牌面一致）
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const MODE_ORDER = ['classic','color','million','double','winner','wheel','surprise','doubleboard'];
+
+// 由 seed 确定性重建牌面（不触碰全局状态，供 live 与 replay 共用）
+function buildBoardLayout(seed, mode){
+  const rng = mulberry32(seed >>> 0);
+  function shuf(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); const t=arr[i]; arr[i]=arr[j]; arr[j]=t; } return arr; }
+  if(mode==='doubleboard'){
+    const a = shuf(AMOUNTS.slice()), b = shuf(AMOUNTS.slice());
+    const out=[];
+    for(let i=0;i<26;i++) out.push({id:i, amount:a[i], board:'A'});
+    for(let i=0;i<26;i++) out.push({id:26+i, amount:b[i], board:'B'});
+    return out;
+  }
+  const amounts = shuf(AMOUNTS.slice());
+  const cs = amounts.map((amt,i)=>({id:i, amount:amt, board:'A'}));
+  if(mode==='million'){
+    // 百万美元任务：复制 1M 到 2 个箱子（替换 750k 与 500k）
+    const bigIdx = cs.filter(c=>c.amount===750000).map(c=>c.id).concat(cs.filter(c=>c.amount===500000).map(c=>c.id));
+    cs[bigIdx[0]].amount = 1000000;
+    cs[bigIdx[1]].amount = 1000000;
+  }
+  if(mode==='surprise'){
+    // 惊喜箱：随机 1 箱为神秘箱，金额随机（可与标准奖金不同）
+    const sidx = Math.floor(rng()*26);
+    cs[sidx].isSurprise = true;
+    cs[sidx].amount = roundToNice(200000 + rng()*1800000); // ¥20万 ~ ¥200万
+  }
+  return cs;
+}
+
+function buildCases(){
+  cases = buildBoardLayout(gameSeed, gameMode).map(c=>({
+    id:c.id, amount:c.amount, opened:false, color:amountColor(c.amount), board:c.board, isSurprise:!!c.isSurprise
+  }));
+  if(gameMode==='million'){ millionCount=3; }
+  if(gameMode==='surprise'){ surpriseCase = cases.find(c=>c.isSurprise) || null; }
+  if(gameMode==='doubleboard'){ dbSub='A'; }
+}
+
+/* ---------------- 初始化 ---------------- */
+function initGame(mode){
+  gameMode = mode || 'classic';
+  gameSeed = (Math.random()*0x100000000) >>> 0;
+  hideContinueButton();
+  haggleUsed = false; finalWin = 0; totalColorBonus = 0;
+  missionBoxes = []; missionBonus = 0; millionCount = 1;
+  surpriseCase = null; surpriseBonus = 0;
+  extraGameResult = null;
+  colorState = null;
+
+  buildCases();
+  recStart(); // 开始记录本局对局（用于分享/回放）
+
+  const meta = MODE_META[gameMode];
+  $('statMode').style.display = 'inline-block';
+  $('statMode').className = meta.sidegame ? 'stat mode-sidegame' : 'stat mode-tag';
+  $('statMode').innerHTML = `模式 <b>${meta.name}</b>${meta.sidegame ? '<span class="sidegame-tag">Sidegame</span>' : ''}`;
+  $('statBonus').style.display = gameMode==='color' ? 'inline-block' : 'none';
+  $('statMission').style.display = (gameMode==='million'||gameMode==='double'||gameMode==='wheel'||gameMode==='surprise') ? 'inline-block' : 'none';
+  $('statBoard').style.display = gameMode==='doubleboard' ? 'inline-block' : 'none';
+  $('colorLegend').style.display = gameMode==='color' ? 'flex' : 'none';
+
+  if(gameMode==='color'){
+    colorState = {};
+    for(const k of COLOR_ORDER) colorState[k] = {cleared:false, bonus:0};
+    renderColorLegend();
+  }
+  if(gameMode==='winner') $('statMission').style.display = 'none';
+
+  playerCase = null;
+  round = 0; openedThisRound = 0; currentOffer = 0; maxOffer = 0; offerReady = false;
+  phase = 'choose';
+  renderCases();
+  renderBoard();
+  updateTopbar();
+  renderDots();
+  $('playerSlot').classList.remove('show');
+  $('hint').style.visibility = 'visible';
+  $('btnHome').style.display = 'flex'; // 游戏中显示返回主菜单按钮
+
+  if(gameMode==='doubleboard'){
+    setMessage('🔀 <b>双倍奖金板</b>：先选择 <b>A 板</b> 的一个箱子作为<b>幸运箱</b>');
+    setHint('两套独立奖金板（A/B）交替开箱，银行家按综合剩余报价');
+  }else if(gameMode==='million'){
+    setMessage('💰 <b>百万美元任务</b>：先选 1 个幸运箱，再选 3 个任务箱');
+    setHint('奖金板含 3 个 ¥1,000,000，任务箱选到 1M 额外奖百万');
+  }else if(gameMode==='surprise'){
+    setMessage('🎁 <b>惊喜箱</b>：26 箱中藏着 1 个神秘惊喜箱');
+    setHint('惊喜箱金额随机（¥20万~¥200万），被打开时计入最终奖金');
+  }else if(gameMode==='double'||gameMode==='wheel'){
+    setMessage(`🎬 请选择你的 <b>幸运箱</b> —— 成交后还有追加玩法！`);
+    setHint('点击任意一个箱子，把它据为己有');
+  }else{
+    setMessage('🎬 请选择你的 <b>幸运箱</b> —— 它将决定你的命运！');
+    setHint('点击任意一个箱子，把它据为己有');
+  }
+}
+
+function renderCases(){
+  const board = $('casesBoard');
+  board.innerHTML = '';
+  cases.forEach(c=>{
+    const el = document.createElement('div');
+    let cls = 'case';
+    if(c.opened) cls += ' opened';
+    if(c === playerCase) cls += ' mine';
+    if(c.board==='B') cls += ' boardB';
+    if(c.isSurprise) cls += ' surprise-mark';
+    el.className = cls;
+    el.dataset.id = c.id;
+    const num = String(c.id+1).padStart(2,'0');
+    if(c.opened){
+      el.innerHTML = `<span class="num">${num}</span><span class="amount">${fmt(c.amount)}</span>`;
+    }else{
+      let inner = `<span class="num">${num}</span><span class="corner">¥</span>`;
+      if(c.isSurprise) inner += `<span class="smark">🎁</span>`;
+      if(c === playerCase) inner += `<span class="corner-r">👑</span>`;
+      el.innerHTML = inner;
+    }
+    el.addEventListener('click', ()=>onCaseClick(c.id));
+    board.appendChild(el);
+  });
+}
+
+function renderBoard(){
+  $('boardLeft').innerHTML  = BOARD_LEFT.map(v=>`<div class="money-cell c-${amountColor(v)}" data-v="${v}">${fmt(v)}</div>`).join('');
+  $('boardRight').innerHTML = BOARD_RIGHT.map(v=>`<div class="money-cell c-${amountColor(v)}" data-v="${v}">${fmt(v)}</div>`).join('');
+}
+function markAmount(amt){
+  document.querySelectorAll('.money-cell').forEach(el=>{
+    if(Math.abs(parseFloat(el.dataset.v)-amt) < 1e-9) el.classList.add('gone');
+  });
+  highlightBoard();
+}
+function highlightBoard(){
+  document.querySelectorAll('.money-cell').forEach(el=>{
+    const v = parseFloat(el.dataset.v);
+    const alive = cases.some(c=>!c.opened && Math.abs(c.amount-v)<1e-9);
+    el.classList.toggle('hot', alive && !el.classList.contains('gone'));
+  });
+}
+
+function remainingSelectable(){
+  if(gameMode==='doubleboard'){
+    // A 板剩余（除玩家箱）+ B 板剩余（全部可开），且按当前子板过滤
+    return cases.filter(c=>!c.opened && c!==playerCase && c.board===dbSub).length;
+  }
+  return cases.filter(c=>!c.opened && c!==playerCase && !missionBoxes.includes(c.id)).length;
+}
+function allRemaining(){ return cases.filter(c=>!c.opened).map(c=>c.amount); }
+
+function setMessage(html){ const m=$('message'); m.innerHTML=html; m.classList.remove('pop'); void m.offsetWidth; m.classList.add('pop'); }
+function setHint(t){ $('hint').textContent = t; }
+function updateTopbar(){
+  $('statRound').innerHTML = `第 <b>${Math.min(round+1,MAX_ROUND)}</b> 轮`;
+  if(gameMode==='doubleboard'){
+    const aLeft = cases.filter(c=>!c.opened&&c.board==='A').length;
+    const bLeft = cases.filter(c=>!c.opened&&c.board==='B').length;
+    $('statLeft').innerHTML = `剩余 <b>${aLeft+bLeft}</b> 箱`;
+    $('statBoard').innerHTML = `A板 <b>${aLeft}</b> · B板 <b>${bLeft}</b>`;
+    const top = Math.max(...allRemaining());
+    $('statTop').innerHTML = `最高 <b>${fmt(top)}</b>`;
+  }else{
+    $('statLeft').innerHTML = `剩余 <b>${cases.filter(c=>!c.opened).length}</b> 箱`;
+    const top = Math.max(...allRemaining());
+    $('statTop').innerHTML = `最高 <b>${fmt(top)}</b>`;
+  }
+  if(gameMode==='color') $('statBonus').innerHTML = `保底 <b>+${fmt(totalColorBonus)}</b>`;
+  if(gameMode==='million'){
+    const remainMission = missionBoxes.filter(id=>!cases[id].opened).length;
+    $('statMission').innerHTML = `任务箱 <b>${remainMission}/3</b>${missionBonus>0?' <b style="color:#fbb4cc">✓ 百万达成</b>':''}`;
+  }
+  if(gameMode==='surprise'){
+    $('statMission').innerHTML = surpriseCase && !surpriseCase.opened ? `惊喜箱 <b>未开启</b>` : `惊喜箱 <b>已开启</b>${surpriseBonus>0?` <b style="color:#fbb4cc">+${fmt(surpriseBonus)}</b>`:''}`;
+  }
+  if(gameMode==='double'||gameMode==='wheel'){ $('statMission').innerHTML = ''; }
+}
+function renderDots(){
+  const wrap = $('roundDots');
+  wrap.innerHTML = '';
+  if(phase==='choose'||phase==='mission'||phase==='over') return;
+  for(let i=0;i<needThisRound;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < openedThisRound ? ' done' : (i === openedThisRound ? ' cur' : ''));
+    wrap.appendChild(d);
+  }
+}
+
+function renderColorLegend(){
+  const leg = $('colorLegend');
+  if(gameMode!=='color'||!colorState){ leg.style.display='none'; return; }
+  leg.style.display='flex'; leg.innerHTML='';
+  for(const k of COLOR_ORDER){
+    const def = COLOR_GROUPS[k], st = colorState[k];
+    const left = cases.filter(c=>c.color===k && !c.opened).length;
+    const span = document.createElement('span');
+    span.className = 'cl '+(st.cleared?'cleared':(left===0&&!st.cleared?'dim':''));
+    span.style.color = 'var(--c-'+k+')'; span.style.borderColor = 'var(--c-'+k+')';
+    span.innerHTML = st.cleared ? `${def.emoji} ${def.name} ✓ <b>+${fmt(st.bonus)}</b>` : `${def.emoji} ${def.name} <b>${left}</b>`;
+    leg.appendChild(span);
+  }
+}
+
+/* ---------------- 交互：选箱/开箱 ---------------- */
+function onCaseClick(id){
+  const c = cases[id];
+  if(phase==='choose'){
+    if(gameMode==='doubleboard' && c.board!=='A'){ setMessage('🔀 请先从 <b>A 板</b> 选择幸运箱'); S.fail(); return; }
+    playerCase = c;
+    if(REPLAY) REPLAY.playerId = id;
+    S.pick();
+    const el = document.querySelector(`.case[data-id="${id}"]`);
+    el.classList.add('mine');
+    const num = String(id+1).padStart(2,'0');
+    $('slotCaseNum').textContent = '#'+num;
+    $('playerSlot').classList.add('show');
+    if(gameMode==='million'){
+      phase='mission';
+      setMessage(`👑 幸运箱 <b>#${num}</b> 已锁定！<br>💰 再选 <b>3 个任务箱</b>（含 ¥1,000,000 额外奖百万）`);
+      setHint('点击 3 个你认为最可能藏着 ¥1,000,000 的箱子');
+    }else{
+      setMessage(`👑 你的幸运箱是 <b>#${num}</b>！主持人把它放到了一边……`);
+      setHint('');
+      phase='reveal';
+      setTimeout(()=>beginRound(), 1300);
+    }
+  }else if(phase==='mission' && gameMode==='million'){
+    if(missionBoxes.includes(id)||c===playerCase||c.opened) return;
+    if(missionBoxes.length>=3) return;
+    missionBoxes.push(id);
+    document.querySelector(`.case[data-id="${id}"]`).classList.add('mission');
+    S.click();
+    if(missionBoxes.length>=3){
+      phase='reveal';
+      setMessage('💰 任务箱已锁定（💰标识），开始开箱……');
+      setTimeout(()=>beginRound(), 1200);
+    }else{
+      setMessage(`💰 已选 <b>${missionBoxes.length}</b>/3 个任务箱，再选 <b>${3-missionBoxes.length}</b> 个`);
+    }
+  }else if(phase==='opening'){
+    if(c.opened || c===playerCase) return;
+    if(gameMode==='doubleboard' && c.board!==dbSub){
+      setMessage(`🔀 本轮先开 <b>${dbSub}板</b> 的箱子（${dbSub==='A'?'B 板下一阶段再开':'A 板下一阶段再开'}）`);
+      return;
+    }
+    openCase(id);
+  }
+}
+
+function openCase(id){
+  const c = cases[id];
+  c.opened = true;
+  openedThisRound++;
+  if(gameMode==='doubleboard'){ if(c.board==='A') dbAOpened++; else dbBOpened++; }
+  S.open();
+  const el = document.querySelector(`.case[data-id="${id}"]`);
+  el.classList.add('opened','flip');
+  // 修复：开箱后箱内直接展示金额
+  el.innerHTML = `<span class="amount">${fmt(c.amount)}</span>`;
+  markAmount(c.amount);
+  updateTopbar();
+  renderDots();
+  setMessage(`📦 箱子 <b>#${String(id+1).padStart(2,'0')}</b> 打开了 —— <b>${fmt(c.amount)}</b>`);
+  recOpen(id);
+
+  if(gameMode==='color') checkColorClear();
+  if(gameMode==='million' && missionBoxes.includes(id) && c.amount===1000000){
+    missionBonus = 1000000;
+    S.million(); confetti();
+    flashTop(`<div class="cf-card million"><div class="t">💰 百 万 任 务 达 成 💰</div><div class="v">任务箱藏有 ¥1,000,000</div><div class="t" style="font-size:.65rem;margin-top:4px;color:#fbb4cc">最终结算额外奖励 ¥1,000,000</div></div>`,'million',3000);
+    updateTopbar();
+  }
+  if(gameMode==='surprise' && c.isSurprise){
+    surpriseBonus = c.amount;
+    S.million(); confetti();
+    flashTop(`<div class="cf-card million"><div class="t">🎁 惊 喜 箱 🎁</div><div class="v">${fmt(c.amount)}</div><div class="t" style="font-size:.65rem;margin-top:4px;color:#fbb4cc">已计入最终奖金</div></div>`,'surprise',3000);
+    updateTopbar();
+  }
+
+  let left;
+  if(gameMode==='doubleboard'){
+    // 本轮 A 开 N 个 + B 开 N 个（用本轮计数，避免累计误判导致提前报价）
+    const need = Math.min(ROUND_CASES[Math.min(round,MAX_ROUND-1)], 26);
+    const aOpened = dbAOpened, bOpened = dbBOpened;
+    const aTotalNeed = need, bTotalNeed = need;
+    const aDone = aOpened >= aTotalNeed;
+    const bDone = bOpened >= bTotalNeed;
+    const bothDone = aDone && bDone;
+    const allLeft = cases.filter(c=>!c.opened&&c!==playerCase).length;
+    if(bothDone || allLeft <= 1){
+      phase='reveal';
+      if(allLeft <= 1){
+        setTimeout(()=>{ setMessage('🎯 两板各剩一箱！'); setTimeout(finalShowdown, 900); }, 700);
+      }else{
+        setTimeout(()=>{ setMessage('☎️ 电话响了……银行家来电！'); setTimeout(startOffer, 1100); }, 700);
+      }
+    }else{
+      if(aDone && dbSub==='A'){ dbSub='B'; setMessage(`🔀 A板已开够 ${aTotalNeed} 个，请从 <b>B 板</b> 再开 ${bTotalNeed - bOpened} 个`); }
+      else if(bDone && dbSub==='B'){ dbSub='A'; setMessage(`🔀 B板已开够 ${bTotalNeed} 个，请从 <b>A 板</b> 再开 ${aTotalNeed - aOpened} 个`); }
+    }
+  }else{
+    const left2 = remainingSelectable();
+    if(openedThisRound >= needThisRound || left2 <= 1){
+      phase='reveal';
+      if(left2 <= 1){
+        setTimeout(()=>{ setMessage('🎯 只剩最后两个箱子了！'); setTimeout(finalShowdown, 900); }, 700);
+      }else{
+        setTimeout(()=>{ setMessage('☎️ 电话响了……银行家来电！'); setTimeout(startOffer, 1100); }, 700);
+      }
+    }
+  }
+}
+
+/* 色组消除：保底反转 —— 越小的奖金等级消除，保底越高 */
+function checkColorClear(){
+  let clearedAny = false;
+  for(const k of COLOR_ORDER){
+    const st = colorState[k];
+    if(st.cleared) continue;
+    const all = cases.filter(c=>c.color===k);
+    if(all.every(c=>c.opened)){
+      st.cleared = true;
+      // 保底 = 剩余均值 × 色组系数；色组金额越小 → 剩余价值越高 → 保底越高
+      const remCases = cases.filter(c=>!c.opened);
+      const remMean = remCases.length ? mean(remCases.map(c=>c.amount)) : 0;
+      const idx = COLOR_ORDER.indexOf(k);
+      const tier = 1 - idx/(COLOR_ORDER.length-1);   // 白=1.0 ... 品红=0.0
+      const factor = 0.05 + tier*0.30;               // 白组~0.35 品红~0.05
+      st.bonus = roundToNice(remMean * factor);
+      totalColorBonus += st.bonus;
+      clearedAny = true;
+      S.colorClear();
+      flashTop(`<div class="cf-card"><div class="t">${COLOR_GROUPS[k].emoji} ${COLOR_GROUPS[k].name}组 · 同色消除</div><div class="v">保底 +${fmt(st.bonus)}</div><div class="t" style="font-size:.62rem;margin-top:4px">已计入后续银行家报价</div></div>`,'clear',2300);
+      setMessage(`${COLOR_GROUPS[k].emoji} <b>${COLOR_GROUPS[k].name}组全部打开！</b> 保底 <b>${fmt(st.bonus)}</b> 已计入后续报价`);
+    }
+  }
+  if(clearedAny){ updateTopbar(); renderColorLegend(); }
+}
+
+function flashTop(html, kind, dur){
+  const f = $('colorFlashTop');
+  f.innerHTML = html;
+  f.classList.remove('show'); void f.offsetWidth; f.classList.add('show');
+  setTimeout(()=>f.classList.remove('show'), dur || 2300);
+}
+
+/* ---------------- 轮次 ---------------- */
+function beginRound(){
+  if(gameMode==='doubleboard'){
+    const allLeft = cases.filter(c=>!c.opened&&c!==playerCase).length;
+    if(allLeft <= 1 || round >= MAX_ROUND){ finalShowdown(); return; }
+    phase='opening'; openedThisRound=0; dbSub='A'; dbAOpened=0; dbBOpened=0;
+    const need = Math.min(ROUND_CASES[Math.min(round,MAX_ROUND-1)], 26);
+    setMessage(`第 <b>${round+1}</b> 轮：先从 <b>A 板</b> 开 ${need} 个，再从 <b>B 板</b> 开 ${need} 个`);
+    setHint('双板交替开箱，报价基于两板综合剩余');
+    renderDots(); updateTopbar();
+    return;
+  }
+  if(round >= MAX_ROUND || remainingSelectable() <= 1){ finalShowdown(); return; }
+  needThisRound = Math.min(ROUND_CASES[round], remainingSelectable());
+  phase='opening'; openedThisRound=0;
+  setMessage(`第 <b>${round+1}</b> 轮：请打开 <b>${needThisRound}</b> 个箱子`);
+  setHint(gameMode==='million'?'提示：任务箱已用 💰 标识' : (gameMode==='surprise'?'🎁 惊喜箱开启即计入奖金' : '点击你怀疑藏着低金额的箱子'));
+  renderDots(); updateTopbar();
+}
+
+/* ---------------- 银行家报价 ---------------- */
+function computeOffer(){
+  const rem = allRemaining();
+  const m = mean(rem);
+  const factor = OFFER_FACTOR[Math.min(round, MAX_ROUND-1)];
+  const big = rem.filter(v=>v>=200000).length;
+  const bigFactor = big===0 ? 0.85 : big===1 ? 0.98 : big===2 ? 1.06 : 1.14;
+  const sizeFactor = 0.80 + (rem.length/(gameMode==='doubleboard'?52:26))*0.40;
+  const jitter = 0.97 + Math.random()*0.12;
+  let offer = m * factor * bigFactor * sizeFactor * jitter;
+  if(gameMode==='color') offer += totalColorBonus;
+  if(gameMode==='million' && millionCount>1) offer *= 0.94; // 多个 1M 时报价更保守
+  if(gameMode==='surprise' && surpriseCase && !surpriseCase.opened) offer *= 0.93; // 惊喜箱未开，银行家压价
+  offer = Math.min(offer, m*0.985);
+  return roundToNice(offer);
+}
+
+function remainPanelHTML(){
+  const alive = allRemaining().sort((a,b)=>a-b);
+  const html = alive.map(v=>`<span class="rc${v>=100000?' big':''}">${fmt(v)}</span>`).join('');
+  return `<div class="remain-panel"><div class="rp-title">💰 剩余未开金额（${alive.length}）</div><div class="rp-grid">${html}</div></div>`;
+}
+function colorStatusHTML(){
+  if(gameMode!=='color'||!colorState) return '';
+  const parts = COLOR_ORDER.map(k=>{
+    const def = COLOR_GROUPS[k], st = colorState[k];
+    return st.cleared
+      ? `<span class="cs done" style="border-color:var(--c-${k})">${def.emoji} ${def.name} <span class="bonus">+${fmt(st.bonus)}</span></span>`
+      : `<span class="cs" style="border-color:var(--c-${k});color:var(--c-${k})">${def.emoji} ${def.name}</span>`;
+  });
+  return `<div class="color-status">${parts.join('')}</div>`;
+}
+
+async function startOffer(){
+  if(phase==='over') return;
+  phase='offer'; offerReady=false;
+  const offer = computeOffer();
+  currentOffer = offer;
+  maxOffer = Math.max(maxOffer, offer);
+  recOffer(offer);
+  S.ring(); heartLoop();
+
+  const extras = [];
+  if(gameMode==='million' && missionBonus>0) extras.push(`<div style="font-size:.72rem;color:#fbb4cc;margin:2px 0 8px">💰 百万任务已达成 · 最终结算额外 +¥1,000,000</div>`);
+  if(gameMode==='surprise' && surpriseBonus>0) extras.push(`<div style="font-size:.72rem;color:#fbb4cc;margin:2px 0 8px">🎁 惊喜箱已开启 · +${fmt(surpriseBonus)} 计入最终奖金</div>`);
+
+  showOverlay(`
+    <div class="ocard">
+      <div class="banker-emoji">☎️</div>
+      <div class="banker-title">银 行 家 来 电</div>
+      <div class="banker-line" id="bkLine">……</div>
+      <div class="offer-box" id="offerNum">???</div>
+      ${extras.join('')}
+      ${colorStatusHTML()}
+      ${totalColorBonus>0?'<div style="font-size:.62rem;color:#7f8db4;margin:-4px 0 8px">消除保底已计入报价 · 报价不超过剩余均值</div>':''}
+      ${remainPanelHTML()}
+      <div class="offer-question">你会如何选择？</div>
+      <div class="offer-btn-wrap" id="offerBtns"></div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+
+  await sleep(2700);
+  $('bkLine').textContent = pick(BANKER_LINES);
+  await sleep(1300);
+  S.offer();
+  animateNumber($('offerNum'), offer, 1900);
+  await sleep(2100);
+  stopHeart();
+  restoreOfferBtns(true);
+  offerReady = true;
+}
+
+function restoreOfferBtns(show){
+  const btns = $('offerBtns');
+  if(!btns) return;
+  btns.innerHTML = `
+    <div class="btn-row">
+      ${haggleUsed?'':'<button class="btn btn-gold" id="btnHaggle">💰 讨价还价</button>'}
+      <button class="btn btn-red" id="btnDeal">Deal 成交</button>
+      <button class="btn btn-green" id="btnNoDeal">No Deal 拒绝</button>
+    </div>`;
+  if(!haggleUsed) $('btnHaggle').addEventListener('click', showHaggle);
+  $('btnDeal').addEventListener('click', onDeal);
+  $('btnNoDeal').addEventListener('click', onNoDeal);
+  if(show) btns.classList.add('show');
+}
+
+function animateNumber(el, target, dur){
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min((now-t0)/dur, 1);
+    const e = 1 - Math.pow(1-t,3);
+    el.textContent = fmt(Math.round(target*e));
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* Deal / No Deal */
+function onDeal(){
+  if(!offerReady || phase!=='offer') return;
+  offerReady = false; stopHeart();
+  recDecision(true);
+  // 追加玩法：双倍或归零 / 交易轮盘
+  if(gameMode==='double'){ showDoubleOrNothing(currentOffer); return; }
+  if(gameMode==='wheel'){ showWheel(currentOffer); return; }
+  finishDealWin(currentOffer);
+}
+function onNoDeal(){
+  if(!offerReady || phase!=='offer') return;
+  offerReady = false; phase='reveal';
+  recDecision(false);
+  stopHeart(); S.nod();
+  hideOverlay();
+  setMessage(`🚫 No Deal！${pick(HOST_NODEAL)}`);
+  round++;
+  setTimeout(beginRound, 900);
+}
+
+/* Deal 成交后：翻开场上所有未开的非玩家箱（节目经典"看看你错过了什么"） */
+async function revealAllRemaining(){
+  const unopened = cases.filter(c=>!c.opened && c!==playerCase);
+  for(const c of unopened){
+    c.opened = true;
+    const el = document.querySelector(`.case[data-id="${c.id}"]`);
+    if(el){
+      el.classList.add('opened','flip');
+      el.innerHTML = `<span class="amount">${fmt(c.amount)}</span>`;
+    }
+    markAmount(c.amount);
+    S.open();
+    await sleep(90);
+  }
+  updateTopbar();
+  return unopened;
+}
+
+/* 场上停留"继续"按钮：翻箱后展示，玩家看清剩余箱子后点击进入结果 */
+function showContinueButton(cb){
+  hideContinueButton();
+  const b = document.createElement('button');
+  b.id = 'btnContinue';
+  b.className = 'btn btn-gold continue-btn';
+  b.innerHTML = '💼 继 续';
+  b.addEventListener('click', ()=>{
+    hideContinueButton();
+    if(cb) cb();
+  });
+  document.body.appendChild(b);
+}
+function hideContinueButton(){
+  const b = document.getElementById('btnContinue');
+  if(b) b.remove();
+}
+
+async function finishDealWin(win){
+  phase='over';
+  hideOverlay();
+  // 翻开所有剩余箱子（你的幸运箱保留，最后揭晓）
+  const hidden = await revealAllRemaining();
+  finalWin = win;
+  S.deal(); confetti();
+  const lines = [`<span class="good">${pick(HOST_DEAL)}</span>`, `你带着 <b>${fmt(win)}</b> 离开了舞台。`];
+  if(hidden.length){
+    const missedTop = Math.max(...hidden.map(c=>c.amount));
+    const diff = Math.round(missedTop - win);
+    lines.push(`<div style="color:#8fa0c8;font-size:.78rem;margin-top:6px">📂 场上剩余 <b>${hidden.length}</b> 个箱子已全部翻开<br>其中最高 <b>${fmt(missedTop)}</b>${diff>0?` · 比你多 <b style="color:#ffb4ba">${fmt(diff)}</b>`:''} · 你的幸运箱留到最后揭晓</div>`);
+  }
+  // 场上停留：让玩家看清所有翻开的箱子，点"继续"再看结果
+  showContinueButton(()=>{
+    recEnd('💰 最终奖金', win, lines);
+    applyEndExtras(win, lines, true);
+  });
+}
+
+/* 结算附加：百万任务/惊喜箱 bonus；赢家通吃对决 */
+function applyEndExtras(base, lines, allowWinner){
+  let total = base;
+  if(missionBonus>0){
+    lines.push(`<div class="bonus-line">💰 百万任务达成 · 额外奖励 <b>+${fmt(missionBonus)}</b></div>`);
+    total += missionBonus;
+  }
+  if(surpriseBonus>0){
+    lines.push(`<div class="bonus-line">🎁 惊喜箱 · 额外计入 <b>+${fmt(surpriseBonus)}</b></div>`);
+    total += surpriseBonus;
+  }
+  if(extraGameResult && extraGameResult.type==='double'){
+    if(extraGameResult.win){
+      lines.push(`<div class="bonus-line">🔥 双倍或归零 · <span class="good">DOUBLE!</span> 奖金翻倍 → <b>+${fmt(extraGameResult.amount)}</b></div>`);
+      total += extraGameResult.amount;
+    }else{
+      lines.push(`<div class="bonus-line">🔥 双倍或归零 · <span class="warn">NOTHING…</span> 奖金归零</div>`);
+      total = 0;
+    }
+  }
+  finalWin = total;
+  if(allowWinner && gameMode==='winner'){
+    showResultOverlay({title:'🕵️ 对决即将开始……', amount: total, lines:[`你带着 <b>${fmt(total)}</b> 等待对手……`], again:false});
+    $('overlayRoot').classList.add('show');
+    setTimeout(()=>winnerShowdown(total), 1600);
+    return;
+  }
+  const finalLines = [...lines];
+  finalLines.push(`<button class="btn btn-ghost" style="margin-top:14px" id="btnRevealMine">打开我的幸运箱，看看错过了什么 →</button>`);
+  showResultOverlay({title:'💰 成交！', amount: total, lines: finalLines, again:true});
+  $('btnRevealMine').addEventListener('click', revealMineAfterDeal);
+}
+
+/* ---------------- 双倍或归零 ---------------- */
+async function showDoubleOrNothing(win){
+  phase='over';
+  hideOverlay();
+  S.ring(); heartLoop();
+  showOverlay(`
+    <div class="ocard">
+      <div class="banker-emoji">🎁</div>
+      <div class="banker-title">神 秘 手 提 箱</div>
+      <div class="mystery-case">❓</div>
+      <div class="banker-line" style="min-height:22px;font-size:.85rem">成交价 <b style="color:#ffe9a8">${fmt(win)}</b> · 要不要再搏一把？</div>
+      <div class="hp-title" style="font-size:.8rem">神秘箱里藏着 <b>DOUBLE</b>（奖金翻倍）或 <b>NOTHING</b>（奖金归零）</div>
+      <div class="btn-row">
+        <button class="btn btn-magenta" id="dnOpen">🔁 搏一把 双倍</button>
+        <button class="btn btn-green" id="dnSkip">✋ 放弃，拿走 ${fmt(win)}</button>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  await sleep(1600);
+  stopHeart();
+  $('dnOpen').addEventListener('click', ()=>resolveDoubleOrNothing(true, win));
+  $('dnSkip').addEventListener('click', ()=>resolveDoubleOrNothing(false, win));
+}
+
+async function resolveDoubleOrNothing(play, win){
+  if(play){
+    const isDouble = Math.random() < 0.5;
+    const mc = document.querySelector('.mystery-case');
+    S.ring();
+    mc.textContent = '?'; mc.style.animation = 'caseFlip .5s ease';
+    await sleep(700);
+    if(isDouble){
+      mc.innerHTML = '💥';
+      S.doubleWin(); confetti();
+      flashTop(`<div class="cf-card"><div class="t">🔥 DOUBLE!</div><div class="v">奖金翻倍 → ${fmt(win*2)}</div></div>`,'double',2600);
+      extraGameResult = {type:'double', win:true, amount: win};
+      await sleep(1600);
+      finishDoubleFinal(win*2, true);
+    }else{
+      mc.innerHTML = '💀';
+      S.zero();
+      flashTop(`<div class="cf-card" style="border-color:#e63946"><div class="t">💀 NOTHING…</div><div class="v">奖金归零</div></div>`,'zero',2600);
+      extraGameResult = {type:'double', win:false, amount: 0};
+      await sleep(1600);
+      finishDoubleFinal(0, false);
+    }
+  }else{
+    extraGameResult = {type:'double', win:true, amount: 0};
+    finishDoubleFinal(win, true);
+  }
+}
+
+async function finishDoubleFinal(win, kept){
+  phase='over';
+  hideOverlay();
+  const hidden = await revealAllRemaining();
+  S.deal();
+  const lines = [kept && win>0 ? `<span class="good">你带着 <b>${fmt(win)}</b> 离开了舞台！</span>` : `<span class="warn">你选择空手而归……</span>`];
+  if(hidden.length){
+    const missedTop = Math.max(...hidden.map(c=>c.amount));
+    lines.push(`<div style="color:#8fa0c8;font-size:.78rem;margin-top:6px">📂 场上剩余 <b>${hidden.length}</b> 个箱子已全部翻开 · 最高 <b>${fmt(missedTop)}</b></div>`);
+  }
+  const total = win;
+  finalWin = total;
+  showContinueButton(()=>{
+    const finalLines = [...lines];
+    finalLines.push(`<button class="btn btn-ghost" style="margin-top:14px" id="btnRevealMine">打开我的幸运箱，看看错过了什么 →</button>`);
+    recEnd(win>0 ? '💰 最终奖金' : '💀 空手而归', total, lines);
+    showResultOverlay({title: win>0 ? '💰 最终奖金' : '💀 空手而归', amount: total, lines: finalLines, again:true});
+    $('btnRevealMine').addEventListener('click', revealMineAfterDeal);
+  });
+}
+
+/* ---------------- 交易轮盘 ---------------- */
+function wheelSegments(win){
+  const rem = allRemaining();
+  const m = Math.max(1, Math.round(mean(rem)));
+  const top = Math.max(...rem);
+  const segs = [
+    {label:fmt(0), v:0, c:'#3a3f5c'},
+    {label:fmt(Math.round(win*0.25)), v:Math.round(win*0.25), c:'#4a4568'},
+    {label:fmt(Math.round(win*0.5)), v:Math.round(win*0.5), c:'#5a4b64'},
+    {label:fmt(Math.round(win*0.75)), v:Math.round(win*0.75), c:'#6a5160'},
+    {label:fmt(win), v:win, c:'#d8b45a'},
+    {label:fmt(Math.round(win*1.1)), v:Math.round(win*1.1), c:'#7a5760'},
+    {label:fmt(Math.round(win*1.25)), v:Math.round(win*1.25), c:'#8a5d60'},
+    {label:fmt(Math.round(win*1.5)), v:Math.round(win*1.5), c:'#9a6360'},
+    {label:fmt(m), v:m, c:'#a36960'},
+    {label:fmt(top), v:top, c:'#b36f60'},
+    {label:fmt(Math.round(win*0.3)), v:Math.round(win*0.3), c:'#5a5c54'},
+    {label:fmt(Math.round(win*1.35)), v:Math.round(win*1.35), c:'#6a6c4c'},
+  ];
+  return segs;
+}
+
+async function showWheel(win){
+  phase='over';
+  hideOverlay();
+  const segs = wheelSegments(win);
+  const segDeg = 360/segs.length;
+  const colors = segs.map(s=>s.c);
+  const bg = segs.map((s,i)=>`${s.c} ${i*segDeg}deg ${(i+1)*segDeg}deg`).join(',');
+  const labels = segs.map((s,i)=>`<div class="seg" style="--rot:${i*segDeg};background:${s.c};clip-path:polygon(50% 50%, 0% 0%, 100% 0%);transform:rotate(${i*segDeg}deg)"><span style="transform:translateY(-52px) rotate(${-i*segDeg}deg)">${s.label}</span></div>`).join('');
+  showOverlay(`
+    <div class="ocard">
+      <div class="banker-title">交 易 轮 盘</div>
+      <div class="banker-line" style="min-height:20px;font-size:.8rem">成交价 <b style="color:#ffe9a8">${fmt(win)}</b> · 转一转，命运由指针决定！</div>
+      <div class="wheel-wrap">
+        <div class="wheel-holder">
+          <div class="wheel-pointer">▼</div>
+          <div class="wheel" id="wheelDisk" style="background:conic-gradient(${bg})">${labels}<div class="wheel-center"></div></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="wheelSpin">🎡 转 动 轮 盘</button>
+        <button class="btn btn-ghost" id="wheelSkip">不转了，拿走 ${fmt(win)}</button>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  $('wheelSpin').addEventListener('click', ()=>spinWheel(win, segs));
+  $('wheelSkip').addEventListener('click', ()=>{ extraGameResult={type:'wheel', win:true, amount:win}; finishWheel(win, true); });
+}
+
+async function spinWheel(win, segs){
+  const disk = $('wheelDisk');
+  const segDeg = 360/segs.length;
+  const idx = Math.floor(Math.random()*segs.length);
+  const extraSpins = 4 + Math.floor(Math.random()*3); // 4~6 圈
+  const target = extraSpins*360 + (360 - (idx*segDeg + segDeg/2));
+  S.spin();
+  disk.style.transition = 'transform 4.2s cubic-bezier(.12,.72,.18,1)';
+  disk.style.transform = `rotate(${target}deg)`;
+  await sleep(4300);
+  S.wheelHit();
+  const prize = segs[idx].v;
+  flashTop(`<div class="cf-card"><div class="t">🎡 轮盘结果</div><div class="v">${fmt(prize)}</div></div>`,'wheel',2600);
+  extraGameResult = {type:'wheel', win:true, amount: prize};
+  await sleep(1400);
+  finishWheel(prize, true);
+}
+
+async function finishWheel(win, kept){
+  phase='over';
+  hideOverlay();
+  const hidden = await revealAllRemaining();
+  S.deal(); confetti();
+  const lines = [`<span class="good">轮盘决定了你的命运！</span>`, `你最终带走了 <b>${fmt(win)}</b>`];
+  if(hidden.length){
+    const missedTop = Math.max(...hidden.map(c=>c.amount));
+    lines.push(`<div style="color:#8fa0c8;font-size:.78rem;margin-top:6px">📂 场上剩余 <b>${hidden.length}</b> 个箱子已全部翻开 · 最高 <b>${fmt(missedTop)}</b></div>`);
+  }
+  const total = win;
+  finalWin = total;
+  showContinueButton(()=>{
+    const finalLines = [...lines];
+    finalLines.push(`<button class="btn btn-ghost" style="margin-top:14px" id="btnRevealMine">打开我的幸运箱，看看错过了什么 →</button>`);
+    recEnd('🎡 最终奖金', total, lines);
+    showResultOverlay({title:'🎡 最终奖金', amount: total, lines: finalLines, again:true});
+    $('btnRevealMine').addEventListener('click', revealMineAfterDeal);
+  });
+}
+
+/* ---------------- 赢家通吃 ---------------- */
+function simulateAI(){
+  // AI 快速模拟一局：随机开箱，按报价算法推算其成交金额
+  const vals = shuffle(AMOUNTS);
+  const aiBox = vals[0];
+  const opened = vals.slice(1, 1+18);
+  const left = vals.slice(19);
+  const m = mean(left);
+  // AI 决策：中后期接受报价（报价>剩余均值55%）
+  const dealFactor = 0.55 + Math.random()*0.2;
+  const aiWin = Math.round(m * dealFactor);
+  return roundToNice(aiWin);
+}
+
+async function winnerShowdown(playerWin){
+  hideOverlay();
+  S.ring();
+  showOverlay(`
+    <div class="ocard">
+      <h1 style="font-size:1.4rem;letter-spacing:3px">🏆 赢家通吃</h1>
+      <div class="sub">两集连播特别节目 · 奖金对决</div>
+      <div class="vs-box">
+        <div class="vs-card"><div class="who">🫵 你</div><div class="amt">${fmt(playerWin)}</div></div>
+        <div class="vs-vs">VS</div>
+        <div class="vs-card" id="aiCard"><div class="who">🤖 前参赛者</div><div class="amt" id="aiAmt">开箱中…</div></div>
+      </div>
+      <div class="banker-line" style="min-height:22px;font-size:.8rem">对手正在完成最后一局……</div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  await sleep(2400);
+  const aiWin = simulateAI();
+  const aiEl = $('aiAmt');
+  animateNumber(aiEl, aiWin, 1400);
+  await sleep(1600);
+  const youWin = playerWin >= aiWin;
+  const total = playerWin + aiWin;
+  const lines = [
+    `<div class="vs-box" style="margin:6px 0">
+      <div class="vs-card ${youWin?'win':'lose'}"><div class="who">🫵 你</div><div class="amt">${fmt(playerWin)}</div></div>
+      <div class="vs-card ${youWin?'lose':'win'}"><div class="who">🤖 对手</div><div class="amt">${fmt(aiWin)}</div></div>
+    </div>`,
+    youWin
+      ? `<span class="good">🏆 你赢了！通吃两人奖金 <b>${fmt(total)}</b>！</span>`
+      : `<span class="warn">😔 对手赢了，通吃两人奖金 ${fmt(total)}……你一无所获。</span>`,
+  ];
+  if(youWin){ S.win(); confetti(); } else { S.fail(); }
+  finalWin = youWin ? total : 0;
+  recEnd(youWin ? '🏆 通吃！' : '💔 惜败', youWin ? total : 0, lines);
+  showResultOverlay({title: youWin ? '🏆 通吃！' : '💔 惜败', amount: youWin ? total : 0, lines, again:true});
+}
+
+/* ---------------- 终局 Keep / Swap ---------------- */
+async function finalShowdown(){
+  if(phase==='over'||phase==='final') return;
+  phase='final';
+  S.ring(); heartLoop();
+  if(gameMode==='doubleboard'){
+    // 两板各剩 1 箱：玩家箱(A) + B板最后1箱
+    const aBox = cases.find(c=>!c.opened&&c.board==='A');
+    const bBox = cases.find(c=>!c.opened&&c.board==='B');
+    hideOverlay();
+    showOverlay(`
+      <div class="ocard">
+        <h1 style="font-size:1.4rem;letter-spacing:3px">双板终局</h1>
+        <div class="sub">A / B 两板各剩一箱，选一个带走</div>
+        <div style="margin:14px 0">
+          <div class="swap-case">
+            <div class="sc mine" id="scA"><span class="num">A#${String(aBox.id+1).padStart(2,'0')}</span></div>
+            <div class="cap">A板 · 你的箱子</div>
+          </div>
+          <div class="swap-case">
+            <div class="sc" id="scB"><span class="num">B#${String(bBox.id+1).padStart(2,'0')}</span></div>
+            <div class="cap">B板 · 最后一箱</div>
+          </div>
+        </div>
+        <div class="banker-line" style="min-height:20px;font-size:.8rem">银行家低语：「两块板，一扇门……」</div>
+        <div class="offer-btn-wrap" id="finalBtns">
+          <div class="btn-row">
+            <button class="btn btn-green" id="btnTakeA">带走 A 板</button>
+            <button class="btn btn-gold" id="btnTakeB">带走 B 板</button>
+          </div>
+        </div>
+      </div>`);
+    $('overlayRoot').classList.add('show');
+    $('btnTakeA').addEventListener('click', ()=>resolveDoubleBoard(false, aBox, bBox));
+    $('btnTakeB').addEventListener('click', ()=>resolveDoubleBoard(true, aBox, bBox));
+    await sleep(1500);
+    stopHeart();
+    if($('finalBtns')) $('finalBtns').classList.add('show');
+    return;
+  }
+  const other = cases.find(c=>!c.opened && c!==playerCase);
+  if(!other){
+    phase='over'; stopHeart();
+    finalWin = playerCase.amount;
+    hideOverlay(); S.final(); confetti();
+    const lines = [`所有台面箱都已揭开，你带着 <b>${fmt(playerCase.amount)}</b> 离开了舞台。`];
+    const total = playerCase.amount + missionBonus + surpriseBonus;
+    if(missionBonus>0) lines.push(`<div class="bonus-line">💰 百万任务达成 · 额外奖励 <b>+${fmt(missionBonus)}</b></div>`);
+    if(surpriseBonus>0) lines.push(`<div class="bonus-line">🎁 惊喜箱 · 额外计入 <b>+${fmt(surpriseBonus)}</b></div>`);
+    finalWin = total;
+    recEnd('🎯 尘埃落定', total, lines);
+    showResultOverlay({title:'🎯 尘埃落定', amount: total, lines, again:true});
+    return;
+  }
+  showOverlay(`
+    <div class="ocard">
+      <h1 style="font-size:1.5rem;letter-spacing:3px">命运的抉择</h1>
+      <div class="sub">最后两个箱子 · 二选一</div>
+      <div style="margin:14px 0">
+        <div class="swap-case">
+          <div class="sc mine" id="scMine"><span class="num">#${String(playerCase.id+1).padStart(2,'0')}</span></div>
+          <div class="cap">你的箱子</div>
+        </div>
+        <div class="swap-case">
+          <div class="sc" id="scOther"><span class="num">#${String(other.id+1).padStart(2,'0')}</span></div>
+          <div class="cap">台上箱子</div>
+        </div>
+      </div>
+      <div class="banker-line" style="min-height:22px;font-size:.8rem">银行家低语：「你真的确定要赌到最后吗……」</div>
+      <div class="offer-btn-wrap" id="finalBtns">
+        <div class="btn-row">
+          <button class="btn btn-green" id="btnKeep">Keep 坚守</button>
+          <button class="btn btn-gold" id="btnSwap">Swap 交换</button>
+        </div>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  $('btnKeep').addEventListener('click', ()=>resolveFinal(false, other));
+  $('btnSwap').addEventListener('click', ()=>resolveFinal(true, other));
+  await sleep(1500);
+  stopHeart();
+  if($('finalBtns')) $('finalBtns').classList.add('show');
+}
+
+async function resolveDoubleBoard(takeB, aBox, bBox){
+  if(phase!=='final') return;
+  phase='over'; stopHeart();
+  const aEl = $('scA'), bEl = $('scB');
+  S.swap();
+  aEl.classList.add('flip-reveal'); bEl.classList.add('flip-reveal');
+  aEl.innerHTML = `<span class="amount">${fmt(aBox.amount)}</span>`;
+  bEl.innerHTML = `<span class="amount">${fmt(bBox.amount)}</span>`;
+  S.reveal();
+  await sleep(800);
+  const won = takeB ? bBox.amount : aBox.amount;
+  const missed = takeB ? aBox.amount : bBox.amount;
+  hideOverlay(); S.final(); confetti();
+  finalWin = won;
+  const lines = [
+    `<span class="good">你选择了 <b>${takeB?'B':'A'} 板</b> —— 箱子 <b>${fmt(won)}</b></span>`,
+    `另一板的箱子是 ${fmt(missed)}。`,
+    `你曾拒绝的最高银行家报价：<b>${fmt(maxOffer)}</b>`,
+  ];
+  recEnd(takeB?'🔀 B板到手':'✋ A板到手', won, lines);
+  showResultOverlay({title: takeB?'🔀 B板到手':'✋ A板到手', amount: won, lines, again:true});
+}
+
+async function resolveFinal(swap, other){
+  if(phase!=='final') return;
+  phase='over'; stopHeart();
+  const mineEl = $('scMine'), otherEl = $('scOther');
+  S.swap();
+  mineEl.classList.add('flip-reveal'); otherEl.classList.add('flip-reveal');
+  mineEl.innerHTML = `<span class="amount">${fmt(playerCase.amount)}</span>`;
+  otherEl.innerHTML = `<span class="amount">${fmt(other.amount)}</span>`;
+  S.reveal();
+  await sleep(800);
+  const won = swap ? other.amount : playerCase.amount;
+  const missed = swap ? playerCase.amount : other.amount;
+  const keptNum = swap ? String(other.id+1).padStart(2,'0') : String(playerCase.id+1).padStart(2,'0');
+  hideOverlay(); S.final(); confetti();
+  finalWin = won;
+  let total = won + missionBonus + surpriseBonus;
+  const lines = [`箱子 <b>#${keptNum}</b> 里装着 <b>${fmt(won)}</b>`];
+  let extra;
+  if(total >= 100000){ extra = `<span class="good">🎉 六位数大奖！你赌赢了！</span>`; }
+  else if(missed >= 100000 && won < 100000){ extra = `<span class="warn">😰 另一个箱子是 ${fmt(missed)}……可惜了。</span>`; }
+  else { extra = won >= missed ? `<span class="good">还好，你选对了箱子！</span>` : `<span class="warn">另一个箱子是 ${fmt(missed)}……你选错了。</span>`; }
+  lines.push(extra);
+  if(missionBonus>0){ lines.push(`<div class="bonus-line">💰 百万任务达成 · 额外奖励 <b>+${fmt(missionBonus)}</b></div>`); }
+  if(surpriseBonus>0){ lines.push(`<div class="bonus-line">🎁 惊喜箱 · 额外计入 <b>+${fmt(surpriseBonus)}</b></div>`); }
+  lines.push(`你曾拒绝的最高银行家报价：<b>${fmt(maxOffer)}</b>`);
+  finalWin = total;
+  if(gameMode==='winner'){
+    showResultOverlay({title: swap?'🔁 你选择了交换':'✋ 你坚守了选择', amount: total, lines:[`你带着 <b>${fmt(total)}</b> 走向对决……`], again:false});
+    $('overlayRoot').classList.add('show');
+    setTimeout(()=>winnerShowdown(total), 1500);
+    return;
+  }
+  recEnd(swap?'🔁 你选择了交换':'✋ 你坚守了选择', total, lines);
+  showResultOverlay({title: swap?'🔁 你选择了交换':'✋ 你坚守了选择', amount: total, lines, again:true});
+}
+
+/* ---------------- 揭示玩家箱 / 结果 ---------------- */
+async function revealMineAfterDeal(){
+  if(playerCase.opened) return;
+  playerCase.opened = true;
+  const el = document.querySelector(`.case[data-id="${playerCase.id}"]`);
+  el.classList.add('opened','flip');
+  el.innerHTML = `<span class="amount">${fmt(playerCase.amount)}</span>`;
+  markAmount(playerCase.amount);
+  S.reveal();
+  const mine = playerCase.amount;
+  const diff = Math.round(mine - finalWin);
+  let extra;
+  if(diff > 0){
+    extra = `<span class="warn">😱 天哪！你的箱子里是 ${fmt(mine)}，比成交价高出 ${fmt(diff)}！不过……你已经做了选择。</span>`;
+    S.fail();
+  }else{
+    extra = `<span class="good">😌 你的箱子里只有 ${fmt(mine)}，好在你做出了明智的选择！</span>`;
+  }
+  const lines = [extra, `你最终带走了 <b>${fmt(finalWin)}</b>`];
+  if(missionBonus>0) lines.push(`<div class="bonus-line">💰 含百万任务奖励 +¥1,000,000</div>`);
+  showResultOverlay({title:'你的幸运箱', amount: mine, lines:[...lines, ''], again:true});
+}
+
+function showResultOverlay({title, amount, lines, again}){
+  const lineHtml = (lines||[]).map(l=>`<div style="margin:4px 0">${l}</div>`).join('');
+  const shareBtn = (again && REPLAY) ? `<button class="btn btn-cyan" id="btnShare" style="margin-top:8px">📤 分享对局</button>` : '';
+  showOverlay(`
+    <div class="ocard">
+      <h1 style="font-size:1.6rem;letter-spacing:3px">${title}</h1>
+      <div class="result-amount">${fmt(amount)}</div>
+      <div class="result-extra">${lineHtml}</div>
+      ${again ? `<div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-gold" id="btnAgain">🔁 再玩一局</button>
+        <button class="btn btn-ghost" id="btnHome2">🏠 返回主菜单</button>
+        ${shareBtn}
+      </div>` : ''}
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  if(again){
+    $('btnAgain').addEventListener('click', ()=>{ hideOverlay(); initGame(gameMode); });
+    $('btnHome2').addEventListener('click', ()=>{ hideOverlay(); showStart(); });
+    if(REPLAY){ const sb=$('btnShare'); if(sb) sb.addEventListener('click', ()=>{ hideOverlay(); openShareModal(REPLAY); }); }
+  }
+}
+function showOverlay(html){ $('overlayRoot').innerHTML = `<div class="overlay show">${html}</div>`; }
+function hideOverlay(){ $('overlayRoot').innerHTML=''; }
+
+/* ============== 对局记录 / 分享 / 回放 ============== */
+function recStart(){
+  if(!cases.length) return;
+  REPLAY = { v:2, mode:gameMode, seed:gameSeed, playerId:null, events:[] };
+  REC = true;
+}
+function recOpen(id){
+  if(!REC || !REPLAY) return;
+  const dbNeed = gameMode==='doubleboard' ? Math.min(ROUND_CASES[Math.min(round,MAX_ROUND-1)], 26) : 0;
+  const meta = ((gameMode==='doubleboard' && dbSub==='B')?1:0)<<7 | (dbNeed&127); // 高 bit=当前板, 低 7bit=本轮需开数
+  REPLAY.events.push({ t:'open', id, meta });
+}
+function recOffer(amt){
+  if(!REC || !REPLAY) return;
+  REPLAY.events.push({ t:'offer', amt });
+}
+function recDecision(deal){
+  if(!REC || !REPLAY) return;
+  REPLAY.events.push({ t:'decide', deal });
+}
+function recEnd(title, amount, lines){
+  if(!REC || !REPLAY) return;
+  const openedIds = cases.filter(c=>c.opened).map(c=>c.id);
+  REPLAY.events.push({ t:'end', title, amount, openedIds, lines, playerId: playerCase?playerCase.id:REPLAY.playerId });
+}
+
+/* ---- 编码 / 解码（DND2：种子 + 紧凑二进制事件 + 可选 gzip） ---- */
+function b64urlEncode(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin=''; for(let i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(b){
+  b=b.replace(/-/g,'+').replace(/_/g,'/');
+  const bin=atob(b); const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function b64urlFromBytes(bytes){
+  let bin=''; for(let i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlToBytes(b){
+  b=b.replace(/-/g,'+').replace(/_/g,'/');
+  const bin=atob(b); const out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+function encU8(a,v){ a.push(v&255); }
+function encU16(a,v){ a.push((v>>>8)&255, v&255); }
+function encU32(a,v){ a.push((v>>>24)&255,(v>>>16)&255,(v>>>8)&255,v&255); }
+function encStr(a,s){ const b=new TextEncoder().encode(s||''); encU16(a,b.length); for(let i=0;i<b.length;i++) a.push(b[i]); }
+function decU16(a,o){ return (a[o]<<8)|a[o+1]; }
+function decU32(a,o){ return ((a[o]<<24)|(a[o+1]<<16)|(a[o+2]<<8)|a[o+3])>>>0; }
+function decStr(a,o){ const n=decU16(a,o); return { v:new TextDecoder().decode(a.slice(o+2,o+2+n)), next:o+2+n }; }
+
+async function gzipBytes(bytes){
+  if(typeof CompressionStream==='undefined') return null;
+  const cs=new CompressionStream('gzip');
+  const w=cs.writable.getWriter(); w.write(bytes); w.close();
+  const buf=await new Response(cs.readable).arrayBuffer();
+  return new Uint8Array(buf);
+}
+async function gunzipBytes(bytes){
+  const ds=new DecompressionStream('gzip');
+  const w=ds.writable.getWriter(); w.write(bytes); w.close();
+  const buf=await new Response(ds.readable).arrayBuffer();
+  return new Uint8Array(buf);
+}
+
+// 把对局序列化成紧凑二进制： [modeIdx][seed u32][playerId][evCount u16][events...]
+function encodeEventsBinary(replay){
+  const body=[];
+  encU8(body, Math.max(0, MODE_ORDER.indexOf(replay.mode)));
+  encU32(body, replay.seed>>>0);
+  encU8(body, (replay.playerId==null?255:replay.playerId)&255);
+  encU16(body, replay.events.length);
+  for(const ev of replay.events){
+    if(ev.t==='open'){
+      encU8(body,0); encU8(body, ev.id&255); encU8(body, ev.meta||0);
+    } else if(ev.t==='offer'){
+      encU8(body,1); encU32(body, Math.max(0,Math.round((ev.amt||0)*100))&4294967295);
+    } else if(ev.t==='decide'){
+      encU8(body,2); encU8(body, ev.deal?1:0);
+    } else if(ev.t==='end'){
+      encU8(body,3);
+      encStr(body, ev.title||'结果');
+      encU32(body, Math.max(0,Math.round((ev.amount||0)*100))&4294967295);
+      const mask=new Uint8Array(7);
+      (ev.openedIds||[]).forEach(id=>{ if(id>=0&&id<56){ mask[id>>3]|=(1<<(id&7)); } });
+      for(let i=0;i<7;i++) body.push(mask[i]);
+      const lines=ev.lines||[];
+      encU16(body, lines.length);
+      for(const l of lines) encStr(body, l);
+    }
+  }
+  return new Uint8Array(body);
+}
+function decodeEventsBinary(payload){
+  let o=0;
+  const modeIdx=(payload[o]&255); o++;
+  const mode=MODE_ORDER[modeIdx]||'classic';
+  const seed=decU32(payload,o); o+=4;
+  const pid=(payload[o]&255); o++;
+  const ec=decU16(payload,o); o+=2;
+  const events=[];
+  for(let i=0;i<ec;i++){
+    const tag=(payload[o]&255); o++;
+    if(tag===0){ const id=(payload[o]&255); o++; const meta=(payload[o]&255); o++; events.push({t:'open',id,meta}); }
+    else if(tag===1){ const amt=decU32(payload,o)/100; o+=4; events.push({t:'offer',amt}); }
+    else if(tag===2){ const d=(payload[o]&255); o++; events.push({t:'decide',deal:!!d}); }
+    else if(tag===3){
+      const tr=decStr(payload,o); o=tr.next;
+      const amount=decU32(payload,o)/100; o+=4;
+      const mask=[]; for(let k=0;k<7;k++) mask.push(payload[o++]&255);
+      const openedIds=[]; for(let id=0;id<56;id++){ if(mask[id>>3]&(1<<(id&7))) openedIds.push(id); }
+      const lc=decU16(payload,o); o+=2;
+      const lines=[];
+      for(let k=0;k<lc;k++){ const r=decStr(payload,o); o=r.next; lines.push(r.v); }
+      events.push({t:'end',title:tr.v,amount,openedIds,lines,playerId:pid});
+    }
+  }
+  return { v:2, mode, seed, playerId: pid===255?null:pid, events };
+}
+
+async function buildShareCode(replay){
+  try{
+    const payload = encodeEventsBinary(replay);
+    const gz = await gzipBytes(payload);
+    const useGz = gz && gz.length < payload.length;
+    const out = useGz ? gz : payload;
+    const final = new Uint8Array(out.length+2);
+    final[0]=2; final[1]= useGz?1:0; final.set(out,2);
+    return 'DND2.' + b64urlFromBytes(final);
+  }catch(e){ return ''; }
+}
+async function parseShareCode(code){
+  code=(code||'').trim();
+  try{
+    if(code.startsWith('DND1.')){
+      const r=JSON.parse(b64urlDecode(code.slice(5)));
+      return (r&&r.board&&r.events)?r:null;
+    }
+    if(code.startsWith('DND2.')){
+      const bytes=b64urlToBytes(code.slice(5));
+      const flags=bytes[1];
+      const payload = (flags&1) ? await gunzipBytes(bytes.slice(2)) : bytes.slice(2);
+      return decodeEventsBinary(payload);
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ---- 轻量提示 ---- */
+let toastTimer=null;
+function toast(msg){
+  let t=$('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; t.style.cssText='position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:rgba(20,28,60,.95);border:1px solid rgba(216,180,90,.6);color:#ffe9a8;padding:10px 18px;border-radius:20px;z-index:400;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none;'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ t.style.opacity='0'; }, 1700);
+}
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t)); }
+  else fallbackCopy(t);
+}
+function fallbackCopy(t){ const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(e){} ta.remove(); }
+
+/* ---- 分享 / 导入弹窗 ---- */
+async function openShareModal(replay){
+  const code = await buildShareCode(replay);
+  const url = location.origin + location.pathname + '?replay=' + code;
+  $('shareTitle').textContent = '📤 分享你的对局';
+  $('shareBody').innerHTML = `
+    <p style="font-size:.84rem;color:#c7d0ec;margin:0 0 10px">把这串对局码发给朋友，或在链接后带上它，别人即可<b>分步回放</b>你这局：</p>
+    <textarea class="share-box" id="shareCode" readonly>${code}</textarea>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-gold" id="shareCopyCode">📋 复制对局码</button>
+      <button class="btn btn-cyan" id="shareCopyLink">🔗 复制分享链接</button>
+      <button class="btn btn-ghost" id="shareDone">✅ 完成</button>
+    </div>`;
+  $('shareOverlay').classList.add('show');
+  $('shareCopyCode').addEventListener('click', ()=>{ copyText(code); toast('已复制对局码'); });
+  $('shareCopyLink').addEventListener('click', ()=>{ copyText(url); toast('已复制分享链接'); });
+  $('shareDone').addEventListener('click', ()=> $('shareOverlay').classList.remove('show'));
+}
+function openImportModal(){
+  $('shareTitle').textContent = '📥 导入对局码';
+  $('shareBody').innerHTML = `
+    <p style="font-size:.84rem;color:#c7d0ec;margin:0 0 10px">粘贴朋友发来的对局码（<code>DND2.</code> 开头），即可观看这局的分步回放：</p>
+    <textarea class="share-box" id="importCode" placeholder="在这里粘贴 DND1. 开头的对局码"></textarea>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-gold" id="importGo">▶ 打开回放</button>
+      <button class="btn btn-ghost" id="importCancel">取消</button>
+    </div>`;
+  $('shareOverlay').classList.add('show');
+  $('importGo').addEventListener('click', async ()=>{
+    const r = await parseShareCode($('importCode').value);
+    if(!r){ toast('对局码无效，请检查'); return; }
+    $('shareOverlay').classList.remove('show');
+    openReplay(r);
+  });
+  $('importCancel').addEventListener('click', ()=> $('shareOverlay').classList.remove('show'));
+}
+function openAbout(){ $('infoOverlay').classList.add('show'); }
+
+/* ---- 分步回放播放器 ---- */
+let rp = null;
+function openReplay(replay){
+  REC = false; // 回放过程不再记录
+  if(!replay || !replay.events){ toast('回放数据无效'); return; }
+  // DND2 对局码只存种子，回放时由种子重建牌面
+  if(!replay.board) replay.board = buildBoardLayout(replay.seed, replay.mode).map(c=>({id:c.id, a:c.amount, bd:c.board}));
+  rp = { replay, idx:0, playing:false, timer:null };
+  $('replayBoard').classList.toggle('board-b', replay.mode==='doubleboard');
+  $('replayTitle').textContent = '📼 回放 · ' + (MODE_META[replay.mode] ? MODE_META[replay.mode].name : '') + ' 对局';
+  $('rpSlider').max = (replay.events.length - 1);
+  $('rpSlider').value = 0;
+  $('replayOverlay').classList.add('show');
+  renderReplayStep(0);
+}
+function closeReplay(){
+  if(rp && rp.timer) clearInterval(rp.timer);
+  rp = null;
+  $('replayOverlay').classList.remove('show');
+}
+function renderReplayStep(i){
+  if(!rp) return;
+  const r = rp.replay, N = r.events.length;
+  if(i<0) i=0; if(i>=N) i=N-1;
+  rp.idx = i;
+  const ev = r.events[i];
+  const opened = new Set();
+  let aCnt=0, bCnt=0;
+  for(let k=0;k<=i;k++){
+    const e=r.events[k];
+    if(e.t==='open'){
+      opened.add(e.id);
+      if(r.mode==='doubleboard'){ if(e.id<26) aCnt++; else bCnt++; }
+    }
+    else if(e.t==='end') (e.openedIds||[]).forEach(x=>opened.add(x));
+  }
+  const playerId = r.playerId;
+  const board = $('replayBoard'); board.innerHTML='';
+  r.board.forEach(c=>{
+    const el=document.createElement('div');
+    let cls='case';
+    if(opened.has(c.id)) cls+=' opened';
+    if(c.id===playerId) cls+=' mine';
+    if(c.bd==='B') cls+=' boardB';
+    el.className=cls;
+    const num=String(c.id+1).padStart(2,'0');
+    if(opened.has(c.id)) el.innerHTML=`<span class="num">${num}</span><span class="amount">${fmt(c.a)}</span>`;
+    else { let inner=`<span class="num">${num}</span><span class="corner">¥</span>`; if(c.id===playerId) inner+=`<span class="corner-r">👑</span>`; if(c.bd==='B') inner+=`<span class="smark" style="font-size:.55rem;right:2px">B</span>`; el.innerHTML=inner; }
+    board.appendChild(el);
+  });
+  const msgEl=$('replayMsg'), hintEl=$('replayHint');
+  $('replayArea').innerHTML='';
+  hintEl.textContent='';
+  if(ev.t==='open'){
+    const c=r.board.find(x=>x.id===ev.id);
+    msgEl.innerHTML = `📦 开箱 #${String(ev.id+1).padStart(2,'0')} · 揭示 <b>${fmt(c?c.a:0)}</b>`;
+    if(r.mode==='doubleboard'){
+      const sub = (ev.meta>>7)?'B 板开箱中':'A 板开箱中';
+      const need = ev.meta&127;
+      hintEl.textContent = `${sub} · 本轮 A ${aCnt}/${need} · B ${bCnt}/${need}`;
+    }
+  } else if(ev.t==='offer'){
+    msgEl.innerHTML = '☎️ 银行家报价';
+    const box=document.createElement('div'); box.className='replay-offer'; box.textContent=fmt(ev.amt);
+    $('replayArea').appendChild(box);
+  } else if(ev.t==='decide'){
+    msgEl.innerHTML = ev.deal?'你选择了 <b>Deal</b> 成交':'你选择了 <b>No Deal</b> 拒绝';
+  } else if(ev.t==='end'){
+    msgEl.innerHTML = '🏁 对局结束';
+    hintEl.textContent='';
+    const card=document.createElement('div'); card.className='replay-result';
+    const linesHTML=(ev.lines||[]).map(l=>l.replace(/<button[\s\S]*?<\/button>/g,'')).map(l=>`<div class="rl">${l}</div>`).join('');
+    card.innerHTML=`<div class="rt">${ev.title||'结果'}</div><div class="ra">${fmt(ev.amount)}</div>${linesHTML}`;
+    $('replayArea').appendChild(card);
+  } else { msgEl.textContent=''; }
+  $('rpSlider').value = i;
+  $('rpLabel').textContent = `步骤 ${i+1} / ${N}`;
+  if(rp.playing && i>=N-1){ rp.playing=false; $('rpPlay').textContent='▶ 播放'; if(rp.timer){clearInterval(rp.timer); rp.timer=null;} }
+}
+function rpNext(){ if(rp) renderReplayStep(rp.idx+1); }
+function rpPrev(){ if(rp) renderReplayStep(rp.idx-1); }
+function rpToggle(){
+  if(!rp) return;
+  if(rp.playing){ rp.playing=false; $('rpPlay').textContent='▶ 播放'; if(rp.timer){clearInterval(rp.timer); rp.timer=null;} }
+  else {
+    if(rp.idx>=rp.replay.events.length-1) renderReplayStep(0);
+    rp.playing=true; $('rpPlay').textContent='⏸ 暂停';
+    rp.timer=setInterval(()=>{
+      if(!rp||!rp.playing) return;
+      if(rp.idx>=rp.replay.events.length-1){ rp.playing=false; $('rpPlay').textContent='▶ 播放'; clearInterval(rp.timer); rp.timer=null; return; }
+      rpNext();
+    }, 1700);
+  }
+}
+
+/* ---------------- 讨价还价 ---------------- */
+function showHaggle(){
+  if(haggleUsed || !offerReady || phase!=='offer') return;
+  S.haggle();
+  const rem = allRemaining();
+  const minV = currentOffer;
+  const maxV = Math.max(...rem);
+  const step = maxV>=100000?5000 : maxV>=10000?1000 : maxV>=1000?100 : 10;
+  const val = Math.min(Math.round((currentOffer*1.5)/step)*step, maxV);
+  const btns = $('offerBtns');
+  btns.innerHTML = `
+    <div class="haggle-panel">
+      <div class="hp-title">🙋 向银行家讨价还价（本局仅此一次机会）</div>
+      <div class="hp-range">
+        <span>${fmt(currentOffer)}</span>
+        <input type="range" id="haggleRange" min="${minV}" max="${maxV}" step="${step}" value="${val}">
+        <span>${fmt(maxV)}</span>
+      </div>
+      <div class="hp-val" id="haggleVal">还价目标：${fmt(val)}</div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="haggleSubmit">向银行家提出</button>
+        <button class="btn btn-ghost" id="haggleCancel">算了</button>
+      </div>
+    </div>`;
+  const range = $('haggleRange');
+  range.addEventListener('input', ()=>{ $('haggleVal').textContent = '还价目标：'+fmt(+range.value); });
+  $('haggleSubmit').addEventListener('click', ()=>doHaggle(+range.value));
+  $('haggleCancel').addEventListener('click', ()=>restoreOfferBtns(false));
+}
+
+function bankerJudge(ask){
+  const rem = allRemaining();
+  const m = mean(rem);
+  const premium = (ask-currentOffer)/Math.max(currentOffer,1);
+  const bigRatio = rem.filter(v=>v>=200000).length/Math.max(rem.length,1);
+  let p = 0.34 + (round/10)*0.25 - premium*0.55 - Math.max(0,premium-0.3)*0.6 - bigRatio*0.28;
+  if(gameMode==='color' && colorState) p += COLOR_ORDER.filter(k=>colorState[k].cleared).length*0.06;
+  if(gameMode==='million' && missionBoxes.length){
+    const remainMission = missionBoxes.filter(id=>!cases[id].opened);
+    p -= (remainMission.length/3)*0.15;
+  }
+  p = Math.max(0.05, Math.min(0.70, p));
+  const pPart = Math.max(0.06, Math.min(0.22, 0.24 - premium*0.12));
+  const r = Math.random();
+  if(ask >= m*0.92){ if(r<0.15) return 'partial'; return 'reject'; }
+  if(r < p) return 'accept';
+  if(r < p + pPart) return 'partial';
+  return 'reject';
+}
+
+async function doHaggle(ask){
+  if(haggleUsed || !offerReady) return;
+  haggleUsed = true;
+  const btns = $('offerBtns');
+  btns.innerHTML = `<div class="banker-thinking">☎️ 银行家正在思考<span class="dots">…</span></div>`;
+  S.ring(); heartLoop();
+  const judge = bankerJudge(ask);
+  await sleep(2600);
+  stopHeart();
+  if(judge==='accept'){
+    offerReady=false; S.haggle();
+    if(gameMode==='double'){ showDoubleOrNothing(ask); return; }
+    if(gameMode==='wheel'){ showWheel(ask); return; }
+    finishDealWin(ask);
+    return;
+  }
+  if(judge==='partial'){
+    const m = mean(allRemaining());
+    const counter = roundToNice(Math.min(ask, (currentOffer + m*0.92)/2));
+    btns.innerHTML = `
+      <div class="hp-title">😤 银行家说「太贪了……不过我可以退一步。」</div>
+      <div class="offer-box" style="font-size:1.6rem">${fmt(counter)}</div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="pAccept">接受 ${fmt(counter)}</button>
+        <button class="btn btn-green" id="pBack">拒绝，维持原报价</button>
+      </div>`;
+    $('pAccept').addEventListener('click', ()=>{
+      offerReady=false;
+      if(gameMode==='double'){ showDoubleOrNothing(counter); return; }
+      if(gameMode==='wheel'){ showWheel(counter); return; }
+      finishDealWin(counter);
+    });
+    $('pBack').addEventListener('click', ()=>restoreOfferBtns(false));
+    return;
+  }
+  S.fail();
+  btns.innerHTML = `
+    <div class="hp-title">❌ 银行家冷笑着拒绝了你的还价。</div>
+    <div class="btn-row"><button class="btn btn-ghost" id="pOk">好吧，那我自己选</button></div>`;
+  $('pOk').addEventListener('click', ()=>restoreOfferBtns(false));
+}
+
+/* ---------------- 彩屑 ---------------- */
+function confetti(){
+  const root = $('confettiRoot');
+  for(let i=0;i<70;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = (Math.random()*100)+'%';
+    p.style.background = `hsl(${Math.random()*360},85%,62%)`;
+    p.style.animationDelay = (Math.random()*0.7)+'s';
+    p.style.animationDuration = (1.7+Math.random()*1.5)+'s';
+    root.appendChild(p);
+    setTimeout(()=>p.remove(), 4000);
+  }
+}
+
+/* ---------------- 开始画面 ---------------- */
+const SG_DESC = {
+  color: {t:'奖金染色 · Color Prize', d:`按金额大小归为 9 个奖金等级色组（金额板染色，箱子不染色）。<b>开完一个色组的全部金额</b> → 色组消除获得保底，计入后续报价。<br><b>越小的奖金等级被开完，保底越高</b>（如白色组消除保底≈剩余均值×35%）；最高奖金开掉后保底仅象征性。`, btn:'🎨 开始 奖金染色'},
+  million: {t:'百万美元任务 · Million Dollar Mission', d:`奖金板中 <b>¥1,000,000 复制为 3 个</b>。选完幸运箱再选 <b>3 个任务箱</b>；若任务箱含 ¥1M → <b>最终结算额外奖励 ¥1,000,000</b>。银行家因百万风险报价更保守。`, btn:'💰 开始 百万任务'},
+  double: {t:'双倍或归零 · Double or Nothing', d:`达成交易（Deal）后，一个<b>神秘手提箱</b>被推出：<b>DOUBLE</b>（奖金翻倍）或 <b>NOTHING</b>（奖金归零），也可以选择放弃、保住原奖金。<br>高风险高回报的追加博弈。`, btn:'🔥 开始 双倍或归零'},
+  winner: {t:'赢家通吃 · Winner Take All', d:`完成你的整局游戏后，一位<b>前参赛者（AI 对手）</b>将与你对决：各自独立获得奖金，<b>奖金高者通吃两人奖金总和</b>，败者一无所获。`, btn:'🏆 开始 赢家通吃'},
+  wheel: {t:'交易轮盘 · Deal Wheel', d:`达成交易后，一个 12 格<b>大轮盘</b>被推出，格子上分布着高于/低于成交价的金额（含归零与剩余最高奖金）。<b>转动轮盘，指针所指金额即最终奖金</b>——全凭运气。`, btn:'🎡 开始 交易轮盘'},
+  surprise: {t:'惊喜箱 · Surprise Case', d:`26 箱中藏着 1 个<b>特殊标记的神秘箱 🎁</b>，金额完全随机（¥20万~¥200万，不限于标准奖金等级）。<b>被打开时该金额直接计入最终奖金</b>。`, btn:'🎁 开始 惊喜箱'},
+  doubleboard: {t:'双倍奖金板 · Double Board', d:`使用 <b>两套独立奖金板</b>（52 箱 A/B）。先从 A 板选幸运箱，两板<b>交替开箱</b>；银行家按<b>两板综合剩余</b>报价；终局时两板各剩一箱，<b>任选一块带走</b>。`, btn:'🔀 开始 双倍奖金板'},
+};
+
+function showStart(){
+  phase='init';
+  hideContinueButton();
+  showOverlay(`
+    <div class="ocard">
+      <h1>一掷千金</h1>
+      <div class="sub">DEAL or NO DEAL · 经典综艺 + 7 大 Sidegames</div>
+      <div class="desc" style="margin-bottom:10px">
+        26 个手提箱藏有 ¥0.01 ~ ¥1,000,000。选幸运箱、每轮开箱、<b>银行家报价</b>、Deal / No Deal，每局一次<b>讨价还价</b>。<br>
+        <span style="color:#7f8db4;font-size:.75rem">建议开启声音，体验完整紧张氛围 🔊</span>
+      </div>
+      <div class="mode-row">
+        <button class="btn btn-gold mode-btn" id="mClassic">🎬 经典模式</button>
+        <button class="btn btn-purple mode-btn" id="mFun">🎮 娱乐模式<span class="sidegame-tag">7 个</span></button>
+      </div>
+      <div class="mode-desc" id="modeDesc"><b>🎬 经典模式</b> —— 原汁原味的《一掷千金》<br>26 箱随机金额，按节目经典节奏开箱、银行家报价、终局 Keep/Swap。<br><span class="hint">适合想体验原版紧张感的玩家</span></div>
+      <div class="btn-row" style="margin-top:4px">
+        <button class="btn btn-ghost" id="btnAbout" style="min-width:auto;font-size:.82rem;padding:9px 14px">📖 游戏背景 / 免责</button>
+        <button class="btn btn-ghost" id="btnImport" style="min-width:auto;font-size:.82rem;padding:9px 14px">📥 导入对局码</button>
+        <button class="btn btn-ghost" id="btnSupport" style="min-width:auto;font-size:.82rem;padding:9px 14px">💖 支持作者</button>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  $('mClassic').addEventListener('click', ()=>{ ensureAudio(); S.click(); hideOverlay(); initGame('classic'); });
+  $('mFun').addEventListener('click', ()=>{ ensureAudio(); S.click(); showFunMenu(); });
+  $('mFun').addEventListener('mouseenter', ()=>{ $('modeDesc').innerHTML = '<b>🎮 娱乐模式</b> —— 7 个官方风格 Sidegame 合集<br>点开后选择玩法：奖金染色 / 百万美元任务 / 双倍或归零 / 赢家通吃 / 交易轮盘 / 惊喜箱 / 双倍奖金板'; });
+  $('mClassic').addEventListener('mouseenter', ()=>{ $('modeDesc').innerHTML = '<b>🎬 经典模式</b> —— 原汁原味<br>26 箱随机金额，经典开箱节奏、银行家报价、终局 Keep/Swap。'; });
+  $('mFun').addEventListener('touchstart', ()=>{ $('modeDesc').innerHTML = '点开娱乐模式，选择 7 个 Sidegame 玩法'; });
+  $('btnAbout').addEventListener('click', openAbout);
+  $('btnImport').addEventListener('click', openImportModal);
+  $('btnSupport').addEventListener('click', ()=>{ S && S.click && S.click(); const w = window.open('support.html','_blank'); if(!w){ location.href = 'support.html'; } });
+  // 返回主菜单悬浮按钮：开始页隐藏，游戏中显示
+  $('btnHome').style.display = 'none';
+}
+
+/* 游戏中返回主菜单：二次确认 */
+function showHomeConfirm(){
+  if(phase==='init') return;
+  stopHeart();
+  S.click();
+  showOverlay(`
+    <div class="ocard" style="max-width:340px">
+      <div class="banker-emoji">🏠</div>
+      <div class="banker-title">返回主菜单？</div>
+      <div class="banker-line" style="min-height:20px;font-size:.85rem;color:#c7d0ec">当前游戏进度将丢失，确定退出吗？</div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="homeYes">✅ 确定返回</button>
+        <button class="btn btn-ghost" id="homeNo">继续游戏</button>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  $('homeYes').addEventListener('click', ()=>{ hideOverlay(); showStart(); });
+  $('homeNo').addEventListener('click', ()=>hideOverlay());
+}
+
+function showFunMenu(){
+  showOverlay(`
+    <div class="ocard">
+      <h1 style="font-size:1.6rem;letter-spacing:3px">🎮 娱乐模式</h1>
+      <div class="sub">SIDEGAMES · 选择一个玩法</div>
+      <div class="sg-list">
+        ${Object.keys(SG_DESC).map(k=>`
+          <div class="sg-item" data-k="${k}">
+            <div class="e">${MODE_META[k].emoji}</div>
+            <div class="t">${SG_DESC[k].t}</div>
+            <div class="go">开始 →</div>
+          </div>`).join('')}
+        <div class="sg-item" data-k="__back" style="opacity:.8">
+          <div class="e">◀️</div>
+          <div class="t">返回模式选择</div>
+          <div class="go">返回</div>
+        </div>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  document.querySelectorAll('.sg-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const k = item.dataset.k;
+      if(k==='__back'){ showStart(); return; }
+      S.click();
+      showSGDetail(k);
+    });
+  });
+}
+
+function showSGDetail(k){
+  const meta = MODE_META[k], desc = SG_DESC[k];
+  showOverlay(`
+    <div class="ocard">
+      <h1 style="font-size:1.5rem;letter-spacing:2px">${meta.emoji} ${meta.name}</h1>
+      <div class="sub" style="margin-bottom:10px">SIDEGAME 玩法说明</div>
+      <div class="desc" style="font-size:.88rem">${desc.d}</div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="sgStart" style="min-width:180px">${desc.btn}</button>
+        <button class="btn btn-ghost" id="sgBack">◀️ 返回</button>
+      </div>
+    </div>`);
+  $('overlayRoot').classList.add('show');
+  $('sgStart').addEventListener('click', ()=>{ hideOverlay(); initGame(k); });
+  $('sgBack').addEventListener('click', showFunMenu);
+}
+
+showStart();
+/* 返回主菜单悬浮按钮：事件绑定一次；initGame 时显示 */
+$('btnHome').addEventListener('click', showHomeConfirm);
+
+/* 关于 / 分享 / 回放：一次性事件绑定 */
+$('aboutLink').addEventListener('click', openAbout);
+$('aboutClose').addEventListener('click', ()=> $('infoOverlay').classList.remove('show'));
+$('infoOverlay').addEventListener('click', e=>{ if(e.target.id==='infoOverlay') $('infoOverlay').classList.remove('show'); });
+$('shareOverlay').addEventListener('click', e=>{ if(e.target.id==='shareOverlay') $('shareOverlay').classList.remove('show'); });
+$('rpClose').addEventListener('click', ()=>{ closeReplay(); showStart(); });
+$('rpPrev').addEventListener('click', ()=>{ if(rp&&rp.playing) rpToggle(); rpPrev(); });
+$('rpNext').addEventListener('click', ()=>{ if(rp&&rp.playing) rpToggle(); rpNext(); });
+$('rpPlay').addEventListener('click', rpToggle);
+$('rpSlider').addEventListener('input', e=>{ if(rp&&rp.playing) rpToggle(); renderReplayStep(parseInt(e.target.value,10)||0); });
+
+/* 启动时：若 URL 带 ?replay= 则自动打开回放 */
+(async function(){
+  const rc = new URLSearchParams(location.search).get('replay');
+  if(rc){
+    try{ const r=await parseShareCode(rc); if(r) setTimeout(()=>openReplay(r), 450); }catch(e){}
+  }
+})();
+
+/* 测试用：暴露内部状态 */
+window.__game = {
+  get cases(){return cases;}, get phase(){return phase;}, get missionBonus(){return missionBonus;},
+  get gameMode(){return gameMode;}, get surpriseBonus(){return surpriseBonus;},
+  get playerCase(){return playerCase;}, get dbSub(){return dbSub;},
+  get REPLAY(){return REPLAY;}, get recEnd(){return recEnd;},
+  buildShareCode, parseShareCode, buildBoardLayout, MODE_ORDER,
+};
+</script>
+</body>
+</html>

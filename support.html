@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1026">
+<title>支持作者 · 一掷千金</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --gold:#d8b45a;--gold-l:#ffd166;--gold-d:#a07c2e;--blue-deep:#0b1026;
+}
+html,body{height:100%;}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background:radial-gradient(1200px 700px at 50% -10%,#1c2a5a 0%,var(--blue-deep) 55%,#05070f 100%);
+  color:#fff;min-height:100%;display:flex;align-items:center;justify-content:center;padding:18px;
+}
+.wrap{max-width:420px;width:100%;text-align:center;}
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-size:.8rem;color:#ffe9a8;background:rgba(216,180,90,.12);border:1px solid rgba(216,180,90,.35);
+  padding:5px 14px;border-radius:999px;margin-bottom:14px;letter-spacing:1px;
+}
+h1{
+  font-size:1.9rem;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(180deg,#ffe9a8,#d8b45a 60%,#9a7a2c);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:6px;
+}
+.sub{color:#8fa0c8;font-size:.85rem;margin-bottom:22px;}
+.card{
+  background:linear-gradient(180deg,#1b2447 0%,#101634 100%);
+  border:2px solid rgba(216,180,90,.55);border-radius:18px;
+  padding:26px 22px 22px;box-shadow:0 0 60px rgba(216,180,90,.18),0 24px 60px rgba(0,0,0,.55);
+}
+.qr-wrap{
+  background:#fff;border-radius:14px;padding:12px;display:inline-block;margin-bottom:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.qr-wrap img{
+  display:block;width:100%;max-width:260px;height:auto;border-radius:8px;
+}
+.note{font-size:.88rem;color:#c7d0ec;line-height:1.7;margin-bottom:22px;}
+.note b{color:var(--gold-l);font-weight:700;}
+.actions{display:flex;flex-direction:column;gap:10px;}
+.btn{
+  border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;
+  padding:12px 20px;transition:transform .15s,filter .15s,box-shadow .15s;font-family:inherit;letter-spacing:1px;
+}
+.btn-gold{
+  background:linear-gradient(180deg,#ffe9a8,#d8b45a 55%,#9a7a2c);
+  color:#1a1205;box-shadow:0 6px 18px rgba(216,180,90,.35);
+}
+.btn-gold:hover{transform:translateY(-2px);filter:brightness(1.08);}
+.btn-gold:active{transform:scale(.97);}
+.btn-ghost{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.22);color:#c7d0ec;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.11);}
+.footer{margin-top:18px;font-size:.72rem;color:#5d6a8f;}
+@media (max-width:420px){
+  h1{font-size:1.6rem;}
+  .card{padding:20px 16px 18px;}
+  .qr-wrap{padding:10px;}
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">💖 感谢支持</div>
+    <h1>一掷千金</h1>
+    <div class="sub">DEAL or NO DEAL</div>
+    <div class="card">
+      <div class="qr-wrap">
+        <img src="reward.png" alt="微信赞赏码" id="qrImg">
+      </div>
+      <div class="note">
+        如果这个小作品带给你一点快乐<br>
+        欢迎<b>微信扫一扫</b>上方赞赏码，请作者吃一份拼好饭<br>
+        作者陷入了严重的生活危机，如果您能够支持一下，就真的太感谢了<br>
+        你的每一份鼓励，都会让作品变得更好
+      </div>
+      <div class="actions">
+        <button class="btn btn-gold" onclick="history.back()">↩ 返回游戏</button>
+        <button class="btn btn-ghost" onclick="window.open('index.html','_self')">🏠 回到首页</button>
+      </div>
+    </div>
+    <div class="footer">不论打赏支持与否，都可以体验该游戏的全量内容<br>
+      很感谢您来玩这个游戏。若有什么好的想法或者建议，欢迎您来<a href="mailto://xcxxduhg1999@126.com">发邮件告知</a></div>
+  </div>
+<script>
+(function(){
+  var img = document.getElementById('qrImg');
+  img.onerror = function(){
+    img.style.display='none';
+    var err = document.createElement('div');
+    err.style.cssText='padding:20px;color:#fbb4cc;font-size:.85rem;';
+    err.textContent='赞赏码图片加载失败，请确认 reward.png 与本文件在同一目录。';
+    img.parentNode.appendChild(err);
+  };
+})();
+</script>
+</body>
+</html>
