@@ -286,7 +286,9 @@ body{
   .sg-item .t{font-size:.82rem;}
 }
 /* ============== 关于 / 分享 / 回放 ============== */
-.about-link{position:fixed;left:14px;bottom:14px;z-index:200;font-size:.78rem;color:#8fa0c8;background:rgba(20,28,60,.72);border:1px solid rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;cursor:pointer;letter-spacing:1px;transition:.2s;}
+.about-link{position:fixed;left:14px;bottom:14px;z-index:200;font-size:.78rem;color:#8fa0c8;background:rgba(20,28,60,.72);border:1px solid rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;cursor:pointer;letter-spacing:1px;transition:.2s;text-decoration:none;}
+.about-link:hover{color:#ffe9a8;border-color:rgba(216,180,90,.45);}
+.about-link--right{left:auto;right:14px;bottom:78px;}
 .about-link:hover{color:#ffe9a8;border-color:rgba(216,180,90,.6);}
 #infoOverlay,#shareOverlay,#replayOverlay{position:fixed;inset:0;z-index:230;display:none;align-items:center;justify-content:center;background:rgba(4,7,18,.92);backdrop-filter:blur(4px);padding:18px;overflow:auto;}
 #infoOverlay.show,#shareOverlay.show,#replayOverlay.show{display:flex;}
@@ -406,6 +408,7 @@ body{
 
 <!-- 角落关于入口（始终可见） -->
 <div class="about-link" id="aboutLink">❓ 关于 / 免责</div>
+<a class="about-link about-link--right" id="aboutProjLink" href="about.html" target="_blank" rel="noopener">📝 关于本项目</a>
 
 <script>
 'use strict';
